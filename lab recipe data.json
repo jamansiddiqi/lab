@@ -1,0 +1,757 @@
+{
+  "meta": {
+    "app": "YD-LAB-Costing",
+    "created": "2026-11-02T09:23:12.008Z",
+    "updated": "2026-11-02T10:42:46.626Z"
+  },
+  "dyes": [
+    {
+      "name": "AVITERA  SKY SE",
+      "price": "25.5"
+    },
+    {
+      "name": "AVITERA ATLANTIC EC-NC",
+      "price": "5"
+    },
+    {
+      "name": "AVITERA BLUE SE",
+      "price": "24.325"
+    },
+    {
+      "name": "AVITERA BORDEUAX SE",
+      "price": "22"
+    },
+    {
+      "name": "AVITERA BRILLIANT YELLOW SE",
+      "price": "17.025"
+    },
+    {
+      "name": "AVITERA CARDINAL SE",
+      "price": "12.5"
+    },
+    {
+      "name": "AVITERA DEEP BLUE SE",
+      "price": "13.5"
+    },
+    {
+      "name": "AVITERA DEEP SEA SE",
+      "price": "12.45"
+    },
+    {
+      "name": "AVITERA GOLD SE",
+      "price": "12.274999999999999"
+    },
+    {
+      "name": "AVITERA LIGHT BLUE SE",
+      "price": "29"
+    },
+    {
+      "name": "AVITERA LIGHT RED SE",
+      "price": "18.9"
+    },
+    {
+      "name": "AVITERA NAVY SE",
+      "price": "15.6"
+    },
+    {
+      "name": "AVITERA ORANGE SE",
+      "price": "9.5"
+    },
+    {
+      "name": "AVITERA RED SE",
+      "price": "24.05"
+    },
+    {
+      "name": "AVITERA ROSE SE",
+      "price": "18.5"
+    },
+    {
+      "name": "Avitera Yellow SE",
+      "price": "18"
+    },
+    {
+      "name": "Coralene Black XF-DS",
+      "price": "8.24"
+    },
+    {
+      "name": "Coralene Brill.Blue SR 100%",
+      "price": "11.25"
+    },
+    {
+      "name": "Coralene Brilliant Red HP-3BS",
+      "price": "16.45"
+    },
+    {
+      "name": "Coralene Dark Blue XF",
+      "price": "11.9"
+    },
+    {
+      "name": "Coralene Golden Yellow HP-3R",
+      "price": "7.9"
+    },
+    {
+      "name": "Coralene Navy XF DS",
+      "price": "10.34"
+    },
+    {
+      "name": "Coralene Rubine XF-2G",
+      "price": "12.95"
+    },
+    {
+      "name": "Coralene Yellow XF",
+      "price": "8.6"
+    },
+    {
+      "name": "DRIMAREN AMBER HD",
+      "price": "9.05"
+    },
+    {
+      "name": "DRIMAREN BLUE CL-BR",
+      "price": "25.5"
+    },
+    {
+      "name": "DRIMAREN DEEP RED HF-4B",
+      "price": "9.95"
+    },
+    {
+      "name": "Drimaren Red K-8B CDG",
+      "price": "25.85"
+    },
+    {
+      "name": "DRIMAREN ULTIMATE CARMINE ES",
+      "price": "12"
+    },
+    {
+      "name": "DRIMAREN ULTIMATE NIGHT SKY HD",
+      "price": "6.3"
+    },
+    {
+      "name": "ERIONYL BLACK AMR",
+      "price": "12.5"
+    },
+    {
+      "name": "ERIONYL BLUE A-R",
+      "price": "30.15"
+    },
+    {
+      "name": "ERIONYL NAVY A-R",
+      "price": "30.75"
+    },
+    {
+      "name": "ERIONYL RED A 2BF",
+      "price": "48.2"
+    },
+    {
+      "name": "ERIONYL RED A-3G",
+      "price": "26.4"
+    },
+    {
+      "name": "ERIONYL TURQUISE  A-G",
+      "price": "26.45"
+    },
+    {
+      "name": "ERIONYL YELLOW A-3G-02",
+      "price": "26.4"
+    },
+    {
+      "name": "ERIONYL YELLOW A-R",
+      "price": "24.6"
+    },
+    {
+      "name": "Jakazol Black DSG",
+      "price": "3.85"
+    },
+    {
+      "name": "Jakazol Black DSR",
+      "price": "4.375"
+    },
+    {
+      "name": "Jakazol Dark Blue SQ",
+      "price": "6.5"
+    },
+    {
+      "name": "Jakazol Deep Red S-LR",
+      "price": "7"
+    },
+    {
+      "name": "Jakazol Navy DSG",
+      "price": "4.5"
+    },
+    {
+      "name": "Jakazol Red DSB",
+      "price": "6.05"
+    },
+    {
+      "name": "Jakazol Red SQ",
+      "price": "5.875"
+    },
+    {
+      "name": "Jakazol Ultra  Yellow DS",
+      "price": "4.75"
+    },
+    {
+      "name": "Jakazol Yellow DS-R",
+      "price": "4.1"
+    },
+    {
+      "name": "Jakazol Yellow HQ-W",
+      "price": "11"
+    },
+    {
+      "name": "LANASET BLUE 2R",
+      "price": "42.75"
+    },
+    {
+      "name": "LANASET BORDEAUX B",
+      "price": "26.9"
+    },
+    {
+      "name": "Lanaset Grey G GR",
+      "price": "37"
+    },
+    {
+      "name": "LANASET ORANGE RN",
+      "price": "23.3"
+    },
+    {
+      "name": "LANASET RED G GR",
+      "price": "35"
+    },
+    {
+      "name": "LANASET YELLOW 2R GR",
+      "price": "27.1"
+    },
+    {
+      "name": "LONKIZOL BLACK LC-D",
+      "price": "5.154"
+    },
+    {
+      "name": "Lonkizol Black LC-G 95%",
+      "price": "4.85"
+    },
+    {
+      "name": "Lonkizol Brill Yellow 4GL 150%",
+      "price": "5.649"
+    },
+    {
+      "name": "Lonkizol Navy GB",
+      "price": "6.432"
+    },
+    {
+      "name": "NEUTRILAN BLACK M-RX",
+      "price": "6.9"
+    },
+    {
+      "name": "NEUTRILAN BLUE S-CF",
+      "price": "18.8"
+    },
+    {
+      "name": "NEUTRILAN BORDEAUX  M-B",
+      "price": "7.75"
+    },
+    {
+      "name": "NEUTRILAN NAVY M-BRX",
+      "price": "9.25"
+    },
+    {
+      "name": "NEUTRILAN RED S-CF",
+      "price": "15.8"
+    },
+    {
+      "name": "NEUTRILAN YELLOW  S-CF",
+      "price": "11.5"
+    },
+    {
+      "name": "Novacron Blue EC-GC",
+      "price": "16.7"
+    },
+    {
+      "name": "Novacron Bold Navy",
+      "price": "6.5"
+    },
+    {
+      "name": "Novacron Bold Red",
+      "price": "6.75"
+    },
+    {
+      "name": "Novacron Bold Yellow",
+      "price": "4.3"
+    },
+    {
+      "name": "NOVACRON BRILLIANT BLUE EC-B",
+      "price": "32.4"
+    },
+    {
+      "name": "NOVACRON BRILLIANT RED EC-3GL",
+      "price": "20.22"
+    },
+    {
+      "name": "NOVACRON BRILLIANT TURQUOISE EC-GN",
+      "price": "7.833333333333333"
+    },
+    {
+      "name": "Novacron Dark Blue S-GL",
+      "price": "12.7"
+    },
+    {
+      "name": "NOVACRON DEEP CHERRY S-D",
+      "price": "12.7"
+    },
+    {
+      "name": "NOVACRON DEEP RED EC-D",
+      "price": "12.15"
+    },
+    {
+      "name": "Novacron NAVY EC-R",
+      "price": "11.1"
+    },
+    {
+      "name": "Novacron Navy S-GI",
+      "price": "7.3"
+    },
+    {
+      "name": "NOVACRON OCEAN S-R",
+      "price": "30.3"
+    },
+    {
+      "name": "NOVACRON RED EC-3B",
+      "price": "14.95"
+    },
+    {
+      "name": "NOVACRON RED EC-4B",
+      "price": "15.8"
+    },
+    {
+      "name": "NOVACRON RUBY S-3B",
+      "price": "8.5"
+    },
+    {
+      "name": "Novacron Scarlet EC-6G",
+      "price": "32.4"
+    },
+    {
+      "name": "NOVACRON SPICE RED W-3B",
+      "price": "10.25"
+    },
+    {
+      "name": "NOVACRON SUPER BLACK G",
+      "price": "4.583333333333333"
+    },
+    {
+      "name": "Novacron Yellow S-3R",
+      "price": "6.55"
+    },
+    {
+      "name": "NYLANTHRENE TURQUOISE BLUE C-3GL",
+      "price": "7.75"
+    },
+    {
+      "name": "NYLANTHRENE TURQUOISE C-3GL  250%",
+      "price": "7.75"
+    },
+    {
+      "name": "NYLANTHRENE YELLOW C-3RL",
+      "price": "13.75"
+    },
+    {
+      "name": "Printofix Blue FB-BT",
+      "price": "8.5"
+    },
+    {
+      "name": "REMAZOL ORANGE RR",
+      "price": "18.4"
+    },
+    {
+      "name": "SINARWHITE 4BK",
+      "price": "4.1"
+    },
+    {
+      "name": "Suncid Blue N-HR",
+      "price": "23.8"
+    },
+    {
+      "name": "Suncid G/Yellow N-3RL",
+      "price": "16.85"
+    },
+    {
+      "name": "Suncid Navy Blue N-RL",
+      "price": "15.9"
+    },
+    {
+      "name": "SUNCID RED  F-B",
+      "price": "17.5"
+    },
+    {
+      "name": "Suncid Red F-GS",
+      "price": "13.35"
+    },
+    {
+      "name": "Suncid Red N-2RL",
+      "price": "20.75"
+    },
+    {
+      "name": "Suncron Brill. Blue R",
+      "price": "21.25"
+    },
+    {
+      "name": "Suncron Orange SR ECO",
+      "price": "29.3"
+    },
+    {
+      "name": "Suncron Pink BG ECO",
+      "price": "34.7"
+    },
+    {
+      "name": "Suncron Red F-5B ECO",
+      "price": "25.6"
+    },
+    {
+      "name": "Suncron Red S-BLSF ECO",
+      "price": "18"
+    },
+    {
+      "name": "Suncron Yellow 10GN 400%",
+      "price": "31.6"
+    },
+    {
+      "name": "Suncron Yellow Brown S-FWN",
+      "price": "8.2"
+    },
+    {
+      "name": "Suncron Yellow S-4G",
+      "price": "12.1"
+    },
+    {
+      "name": "Sunfix Blue SSR",
+      "price": "25.35"
+    },
+    {
+      "name": "Sunfix Navy Blue SS",
+      "price": "5.3"
+    },
+    {
+      "name": "Sunfix Red SPR",
+      "price": "8.63"
+    },
+    {
+      "name": "Sunset Bordeaux B",
+      "price": "11.7"
+    },
+    {
+      "name": "Sunset Green B",
+      "price": "19.5"
+    },
+    {
+      "name": "Sunset Grey G",
+      "price": "25.85"
+    },
+    {
+      "name": "SUNSET RED 2B",
+      "price": "18.75"
+    },
+    {
+      "name": "Sunset Turquoise Blue 5G",
+      "price": "9.15"
+    },
+    {
+      "name": "Sunset Yellow 2R",
+      "price": "10.65"
+    },
+    {
+      "name": "Sunset Yellow 4GN",
+      "price": "18.8"
+    },
+    {
+      "name": "Sunzol Black DN conc.",
+      "price": "4.975"
+    },
+    {
+      "name": "Sunzol Turquoise Blue G 266%",
+      "price": "9.75"
+    },
+    {
+      "name": "SYNO WHITE 4BK",
+      "price": "4.1"
+    },
+    {
+      "name": "SYNO WHITE AD CONC",
+      "price": "7.2"
+    },
+    {
+      "name": "SYNO WHITE BYB",
+      "price": "4.61"
+    },
+    {
+      "name": "SYNOLON BLUE EN-F",
+      "price": "17.875"
+    },
+    {
+      "name": "SYNOLON GOLDEN YELLOW EXW",
+      "price": "11.7"
+    },
+    {
+      "name": "SYNOLON NAVY BLUE EXW",
+      "price": "22"
+    },
+    {
+      "name": "SYNOLON NAVY BLUE EXWN",
+      "price": "13.2"
+    },
+    {
+      "name": "SYNOLON RED   EN-F",
+      "price": "15.5"
+    },
+    {
+      "name": "SYNOLON RUBINE EXWN",
+      "price": "16.4"
+    },
+    {
+      "name": "SYNOLON SUPER RED EXW",
+      "price": "23"
+    },
+    {
+      "name": "SYNOLON TURQUISE EXW",
+      "price": "33.133"
+    },
+    {
+      "name": "SYNOLON YELLOW  EN-F",
+      "price": "13.1"
+    },
+    {
+      "name": "SYNOLON YELLOW EXWN",
+      "price": "12.7"
+    },
+    {
+      "name": "SYNOZOL AMBER K-NP",
+      "price": "16.65"
+    },
+    {
+      "name": "Synozol Black B 150%",
+      "price": "3.55"
+    },
+    {
+      "name": "Synozol Blue K-BR",
+      "price": "15.049999999999999"
+    },
+    {
+      "name": "Synozol Blue K-CF",
+      "price": "15.4"
+    },
+    {
+      "name": "SYNOZOL BLUE K-HL",
+      "price": "16"
+    },
+    {
+      "name": "SYNOZOL BLUE K-RF",
+      "price": "19.1"
+    },
+    {
+      "name": "SYNOZOL BRIL. BLUE K-RL CONC SP",
+      "price": "21.8"
+    },
+    {
+      "name": "SYNOZOL BRILLIANT RED F3B",
+      "price": "17.6"
+    },
+    {
+      "name": "Synozol Brown K-HL",
+      "price": "16.3"
+    },
+    {
+      "name": "SYNOZOL NAVY BLUE K-BF",
+      "price": "6"
+    },
+    {
+      "name": "Synozol Olive K-HL",
+      "price": "30.8"
+    },
+    {
+      "name": "Synozol Red K-3BS",
+      "price": "6.45"
+    },
+    {
+      "name": "Synozol Red K-RF",
+      "price": "20.2"
+    },
+    {
+      "name": "SYNOZOL TURQUISE BLUE HF-G  266%",
+      "price": "10.899999999999999"
+    },
+    {
+      "name": "SYNOZOL ULTRA BLACK DR",
+      "price": "3.95"
+    },
+    {
+      "name": "SYNOZOL ULTRA BLACK G",
+      "price": "4.85"
+    },
+    {
+      "name": "Synozol Ultra Bordeaux DS",
+      "price": "9.450000000000001"
+    },
+    {
+      "name": "SYNOZOL ULTRA DEEP BLUE DS",
+      "price": "16.424999999999997"
+    },
+    {
+      "name": "SYNOZOL ULTRA NAVY DS",
+      "price": "6.2"
+    },
+    {
+      "name": "SYNOZOL ULTRA NAVY DS-R",
+      "price": "6.222500000000001"
+    },
+    {
+      "name": "SYNOZOL ULTRA RED DS",
+      "price": "6.95"
+    },
+    {
+      "name": "SYNOZOL ULTRA YELLOW DS",
+      "price": "6.445"
+    },
+    {
+      "name": "SYNOZOL YELLOW HF-4GL 200%",
+      "price": "8.62"
+    },
+    {
+      "name": "Synozol Yellow K-3RS",
+      "price": "6.45"
+    },
+    {
+      "name": "Synozol Yellow K-HL",
+      "price": "6.4"
+    },
+    {
+      "name": "Taiacryl Black SR-T 200%",
+      "price": "10.82"
+    },
+    {
+      "name": "Taiacryl Blue 5G-T 200%",
+      "price": "17.5"
+    },
+    {
+      "name": "Taiacryl Blue A2G-T",
+      "price": "6.9"
+    },
+    {
+      "name": "Taiacryl Blue GRF-T 200%",
+      "price": "9.69"
+    },
+    {
+      "name": "Taiacryl Golden Yellow BR-T 200%",
+      "price": "7.8"
+    },
+    {
+      "name": "TAIACRYL RED CD-GRL",
+      "price": "10"
+    },
+    {
+      "name": "Taiacryl Red GTL-T 200%",
+      "price": "9.5"
+    },
+    {
+      "name": "Taiacryl Red Violet 3R-T 200%",
+      "price": "18.08"
+    },
+    {
+      "name": "Taiacryl Yellow 4GN-T 200%",
+      "price": "9.57"
+    }
+  ],
+  "records": [
+    {
+      "id": "r1793611627521",
+      "date": "2026-11-02",
+      "buyer": "srg",
+      "shade": "asdf",
+      "count": "sadf",
+      "pre": "Bleach",
+      "lab": "123123",
+      "rem": "",
+      "dyes": [
+        {
+          "name": "NOVACRON SUPER BLACK G",
+          "pct": "1",
+          "price": "4.583333333333333"
+        },
+        {
+          "name": "AVITERA ATLANTIC EC-NC",
+          "pct": "1",
+          "price": "5"
+        },
+        {
+          "name": "AVITERA  SKY SE",
+          "pct": "1",
+          "price": "25.5"
+        }
+      ],
+      "locked": true,
+      "by": "jaman",
+      "at": "2026-11-02T09:27:07.521Z",
+      "modBy": "Ajman",
+      "modAt": "2026-11-02T10:42:44.417Z"
+    },
+    {
+      "id": "r1793611934835",
+      "date": "2026-11-02",
+      "buyer": "sdf",
+      "shade": "sdf",
+      "count": "sdfsd",
+      "pre": "Bleach",
+      "lab": "747474",
+      "rem": "",
+      "dyes": [
+        {
+          "name": "AVITERA  SKY SE",
+          "pct": "1",
+          "price": "25.50"
+        },
+        {
+          "name": "AVITERA BLUE SE",
+          "pct": "1",
+          "price": "24.32"
+        },
+        {
+          "name": "AVITERA BORDEUAX SE",
+          "pct": "1",
+          "price": "22.00"
+        }
+      ],
+      "locked": false,
+      "by": "Kamal",
+      "at": "2026-11-02T09:32:14.835Z",
+      "modBy": "Jaman",
+      "modAt": "2026-11-02T10:22:41.601Z"
+    },
+    {
+      "id": "r1793615808699",
+      "date": "2026-11-02",
+      "buyer": "sdf",
+      "shade": "asdf",
+      "count": "sadf",
+      "pre": "Bleach",
+      "lab": "2123123",
+      "rem": "",
+      "dyes": [
+        {
+          "name": "AVITERA  SKY SE",
+          "pct": "2",
+          "price": "25.50"
+        },
+        {
+          "name": "AVITERA BLUE SE",
+          "pct": "1",
+          "price": "24.32"
+        },
+        {
+          "name": "AVITERA BRILLIANT YELLOW SE",
+          "pct": "3",
+          "price": "17.02"
+        }
+      ],
+      "locked": false,
+      "by": "Jaman Siddiqi",
+      "at": "2026-11-02T10:36:48.699Z"
+    }
+  ]
+}
