@@ -17,8 +17,8 @@
   .userbox{display:flex;align-items:center;gap:14px}
   .uname{display:flex;align-items:center;gap:8px;font-size:14px}
   .avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-weight:700;font-size:14px;text-transform:uppercase}
-  .logout{background:#d62f2f;border:1px solid #d62f2f;color:#fff;padding:7px 16px;border-radius:4px;cursor:pointer;font-size:13px;font-weight:600}
-  .logout:hover{background:#b21f1f;border-color:#b21f1f}
+  .logout{background:none;border:0;color:#f3c6c6;padding:2px 4px;cursor:pointer;font-size:11px;font-weight:600}
+  .logout:hover{color:#fff;text-decoration:underline}
   .toolbar{background:#fff;border-bottom:1px solid var(--line);padding:6px 20px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
   .toolbar button{background:#f6f8fb;border:1px solid var(--line);color:var(--navy);padding:5px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600}
   .toolbar button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -43,13 +43,16 @@
   #tbody tr{cursor:pointer}
   #tbody tr:hover td{background:#f0f6fd}
   .lockic{color:var(--danger);font-weight:700}
+  .costhot{display:inline-block;color:#fff;font-weight:700;font-size:11px;padding:1px 5px;border-radius:3px;cursor:help;animation:fireGlow 1s ease-in-out infinite}
+  @keyframes fireGlow{
+    0%,100%{background:#ff3b30;box-shadow:0 0 5px 1px rgba(255,59,48,.75),0 0 10px 3px rgba(255,123,0,.35)}
+    50%{background:#ff7b00;box-shadow:0 0 10px 4px rgba(255,123,0,.9),0 0 18px 7px rgba(255,59,48,.5)}
+  }
   .empty{padding:40px;text-align:center;color:#7a8797}
   .overlay{position:fixed;inset:0;background:rgba(10,25,45,.35);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;z-index:50;padding:12px}
   .overlay.top{z-index:60}
   .overlay.show{display:flex}
   .modal{position:relative;background:#fff;border-radius:8px;padding:24px 26px;width:min(430px,94vw);max-height:94vh;overflow:auto;box-shadow:0 12px 40px rgba(0,0,0,.35)}
-  .modalClose{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;border:0;background:#d62f2f;color:#fff;font-size:15px;font-weight:700;cursor:pointer;line-height:1}
-  .modalClose:hover{background:#b21f1f}
   .modal.wide{width:min(680px,96vw)}
   .modal.xl{width:min(860px,96vw)}
   .modal h2{margin:0 0 4px;color:var(--navy);font-size:20px}
@@ -60,6 +63,7 @@
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
   .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
   .btn{padding:9px 20px;border:0;border-radius:4px;font-size:14px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff}
+  #loginBtn:hover{background:#1e8e5a}
   .btn.sec{background:#e3e9f1;color:var(--navy)}
   .btn.danger{background:#d62f2f;color:#fff}
   .btn.danger:hover{background:#b21f1f}
@@ -141,7 +145,7 @@
   <button id="bEdit">Edit</button>
   <button id="bView">View</button>
   <button id="bPrint">Print</button>
-  <button id="bRepPrint" disabled title="Under Maintenance, trying to improve to add dyes name">Report Print</button>
+  <button id="bRepPrint" disabled title="Under Maintenance, trying to improve to add dye names" >Report Print</button>
   <button id="bDyeUp">Dyes Upload</button>
   <button id="bDyeView">Dyes View</button>
   <button id="bLock">Lock</button>
@@ -165,7 +169,6 @@
 <!-- Login popup -->
 <div class="overlay show" id="loginOv">
   <form class="modal" id="loginForm" autocomplete="off">
-    <button type="button" class="modalClose" id="loginCloseBtn" title="Close">&times;</button>
     <h2>YD-LAB-Costing Login</h2>
     <p>Please enter your name to continue.</p>
     <label>User Name</label>
@@ -226,7 +229,7 @@
 <!-- View record popup -->
 <div class="overlay" id="viewOv">
   <div class="modal wide">
-    <h2>View Record</h2><p>&nbsp;</p>
+    <h2>View Recipe</h2><p>&nbsp;</p>
     <div id="viewBody"></div>
     <div class="actions"><button class="btn" id="viewClose">Close</button></div>
   </div>
@@ -261,6 +264,8 @@
       <div><label>Count</label><input id="aCount"></div>
       <div><label>Labdip No</label><input id="aLab" inputmode="numeric"></div>
       <div></div>
+      <div><label>Shade% Min</label><input id="aPmin" type="number" step="any" min="0"></div>
+      <div><label>Shade% Max</label><input id="aPmax" type="number" step="any" min="0"></div>
       <div><label>Cost/Kg ($) Min</label><input id="aCmin" type="number" step="any" min="0"></div>
       <div><label>Cost/Kg ($) Max</label><input id="aCmax" type="number" step="any" min="0"></div>
     </div>
@@ -293,7 +298,12 @@
   const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const num=v=>{const n=parseFloat(String(v).replace(/[^0-9.\-]/g,''));return isNaN(n)?0:n;};
   const p2=v=>{const n=parseFloat(String(v??'').replace(/[^0-9.\-]/g,''));return isNaN(n)?'':n.toFixed(2);};
+  const pctFmt=v=>{const s=String(v??'').trim();return s===''?'':(/^\./.test(s)?'0'+s:s);};
   const dt=s=>{if(!s)return '';const p=String(s).split('-');return p.length===3?`${p[2]}-${p[1]}-${p[0]}`:s;};
+  const fmtTime=iso=>{if(!iso)return '';const d=new Date(iso);if(isNaN(d))return '';let h=d.getHours();const mi=String(d.getMinutes()).padStart(2,'0');const ap=h>=12?'PM':'AM';h=h%12;if(h===0)h=12;return h+':'+mi+' '+ap;};
+  const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const WDAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const fmtFull=iso=>{if(!iso)return '';const d=new Date(iso);if(isNaN(d))return '';const dd=String(d.getDate()).padStart(2,'0');return `${dd} ${MONTHS[d.getMonth()]} ${d.getFullYear()} | ${WDAYS[d.getDay()]} Day | ${fmtTime(iso)}`;};
   const low=s=>String(s??'').toLowerCase();
   /* "  karim   mia " -> "Karim Mia" */
   const titleCase=s=>String(s||'').trim().replace(/\s+/g,' ').toLowerCase().replace(/(^|[\s.\-'])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
@@ -355,10 +365,6 @@
     if(await tryStored()){showApp();return;}
     $('choice').style.display='block';
   });
-  $('loginCloseBtn').onclick=()=>{
-    window.close();
-    setTimeout(()=>toast("Could not close the tab automatically - please close it yourself",4000),300);
-  };
   $('chOpen').onclick=async()=>{if(await pickOpen())showApp();};
   $('chNew').onclick=async()=>{if(await pickNew())showApp();};
   $('chSkip').onclick=()=>{setStatus(false,'Database not connected');showApp();};
@@ -390,6 +396,9 @@
       if(has(adv.shade)&&!low(r.shade).includes(low(adv.shade).trim()))continue;
       if(has(adv.count)&&!low(r.count).includes(low(adv.count).trim()))continue;
       if(has(adv.lab)&&!low(r.lab).includes(low(adv.lab).trim()))continue;
+      const pc=+pctOf(r).toFixed(2);
+      if(has(adv.pmin)&&pc<num(adv.pmin))continue;
+      if(has(adv.pmax)&&pc>num(adv.pmax))continue;
       const c=+costOf(r).toFixed(3);
       if(has(adv.cmin)&&c<num(adv.cmin))continue;
       if(has(adv.cmax)&&c>num(adv.cmax))continue;
@@ -409,6 +418,8 @@
     if(has(adv.shade))p.push('Shade: '+adv.shade);
     if(has(adv.count))p.push('Count: '+adv.count);
     if(has(adv.lab))p.push('Labdip No: '+adv.lab);
+    if(has(adv.pmin))p.push('Shade% min: '+adv.pmin+'%');
+    if(has(adv.pmax))p.push('Shade% max: '+adv.pmax+'%');
     if(has(adv.cmin))p.push('Cost/Kg min: '+adv.cmin+' $');
     if(has(adv.cmax))p.push('Cost/Kg max: '+adv.cmax+' $');
     return p.join('  |  ')||'All records';
@@ -420,7 +431,8 @@
     for(const x of list){
       const r=x.r,i=x.n-1;
       const tr=document.createElement('tr');if(r.id===selId)tr.className='sel';
-      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.date)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${pctOf(r).toFixed(2)}%</td><td>${costOf(r).toFixed(3)} $</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}</td>`;
+      const _c=costOf(r),_cTxt=`${_c.toFixed(3)} $`,_cCell=_c>=0.3?`<span class="costhot" title="Don't Dye, talk with Higher Management.">${_cTxt}</span>`:_cTxt;
+      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.date)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
       tr.addEventListener('click',()=>{selId=r.id;render();});
       tb.appendChild(tr);
     }
@@ -439,8 +451,12 @@
     const tb=$('dyeRows');tb.innerHTML='';
     formDyes.forEach((d,i)=>{
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${esc(d.name)}</td><td><input type="number" step="any" min="0" value="${esc(d.pct)}" data-k="pct"></td><td><input type="number" step="any" min="0" value="${esc(p2(d.price))}" data-k="price"></td><td><button type="button" class="btn sm red">&times;</button></td>`;
-      tr.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{formDyes[i][inp.dataset.k]=inp.value;calcTot();}));
+      tr.innerHTML=`<td>${esc(d.name)}</td><td><input type="number" step="any" min="0" value="${esc(pctFmt(d.pct))}" data-k="pct"</td><td><input type="number" step="any" min="0" value="${esc(p2(d.price))}" data-k="price"></td><td><button type="button" class="btn sm red">&times;</button></td>`;
+      tr.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{
+        let v=inp.value;
+        if(inp.dataset.k==='pct'&&/^\./.test(v)){v='0'+v;inp.value=v;}
+        formDyes[i][inp.dataset.k]=v;calcTot();
+      }));
       const pr=tr.querySelector('[data-k=price]');
       pr.addEventListener('blur',()=>{pr.value=p2(pr.value);formDyes[i].price=pr.value;calcTot();});
       tr.querySelector('button').onclick=()=>{formDyes.splice(i,1);renderDyeRows();};
@@ -454,7 +470,7 @@
   }
   function openForm(r){
     editId=r?r.id:null;
-    $('recTitle').textContent=r?'Edit Record':'Add Your Recipe';
+    $('recTitle').textContent=r?'Edit Recipe':'Add Your Recipe';
     $('fDate').value=r?r.date:new Date().toISOString().slice(0,10);
     $('fBuyer').value=r?r.buyer:'';$('fShade').value=r?r.shade:'';$('fCount').value=r?r.count:'';
     $('fPre').value=r?r.pre:'Bleach';$('fLab').value=r?r.lab:'';$('fRem').value=r?r.rem:'';
@@ -495,11 +511,11 @@
   /* ---------- View record ---------- */
   $('bView').onclick=()=>{
     const r=sel();if(!r)return;
-    const rows=[['Date',r.date],['Buyer',r.buyer],['Shade Name',r.shade],['Count',r.count],['Pretreatment',r.pre],['Labdip No',r.lab],['Remarks',r.rem],['Locked',r.locked?'Yes':'No'],['Entry By',r.by],['Created at',r.at]];
+    const rows=[['Date',r.date],['Buyer',r.buyer],['Shade Name',r.shade],['Count',r.count],['Pretreatment',r.pre],['Labdip No',r.lab],['Remarks',r.rem],['Locked',r.locked?'Yes':'No'],['Entry By',r.by],['Created at',fmtFull(r.at)]];
     let h=rows.map(x=>`<div class="viewrow"><b>${x[0]}</b><span>${esc(x[1])}</span></div>`).join('');
     h+=`<div class="dyebox" style="margin-top:12px"><table class="dyetbl"><thead><tr><th>Dyes Name</th><th>Shade %</th><th>Price</th><th>Cost</th></tr></thead><tbody>`+
       (r.dyes||[]).map(d=>`<tr><td>${esc(d.name)}</td><td>${esc(d.pct)}</td><td>${esc(p2(d.price))}</td><td>${(num(d.price)*num(d.pct)/100).toFixed(3)} $</td></tr>`).join('')+
-      `</tbody></table><div class="totalrow">Cost/Kg ($): ${costOf(r).toFixed(3)} $</div></div>`;
+      `</tbody></table><div class="totalrow"><span>Cost/Kg ($): ${costOf(r).toFixed(3)} $</span><span>Shade% : ${pctOf(r).toFixed(2)}%</span></div></div>`;
     $('viewBody').innerHTML=h;$('viewOv').classList.add('show');
   };
   $('viewClose').onclick=()=>$('viewOv').classList.remove('show');
@@ -582,10 +598,10 @@
   $('fLab').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('aLab').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('qSearch').addEventListener('input',e=>{qText=e.target.value;render();});
-  const AF={aFrom:'from',aTo:'to',aBy:'by',aBuyer:'buyer',aShade:'shade',aCount:'count',aLab:'lab',aCmin:'cmin',aCmax:'cmax'};
+  const AF={aFrom:'from',aTo:'to',aBy:'by',aBuyer:'buyer',aShade:'shade',aCount:'count',aLab:'lab',aPmin:'pmin',aPmax:'pmax',aCmin:'cmin',aCmax:'cmax'};
   $('bAdv').onclick=()=>{for(const k in AF)$(k).value=adv[AF[k]]||'';$('advOv').classList.add('show');};
   $('advClose').onclick=()=>$('advOv').classList.remove('show');
-  $('advClear').onclick=()=>{adv={};for(const k in AF)$(k).value='';render();$('advOv').classList.remove('show');};
+  $('advClear').onclick=()=>{adv={};for(const k in AF)$(k).value='';render();};
   $('advForm').addEventListener('submit',e=>{
     e.preventDefault();
     adv={};for(const k in AF){const v=$(k).value.trim();if(v)adv[AF[k]]=v;}
@@ -599,7 +615,7 @@
     const list=visible();
     if(!list.length){toast('No records to print');return;}
     const rows=list.map((x,i)=>{const r=x.r;
-      return `<tr><td>${i+1}</td><td>${esc(dt(r.date))}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td class="r">${costOf(r).toFixed(3)} $</td><td>${esc(r.rem)}</td></tr>`;}).join('');
+      return `<tr><td>${i+1}</td><td>${esc(dt(r.date))}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td class="r">${pctOf(r).toFixed(2)}%</td><td class="r">${costOf(r).toFixed(3)} $</td><td>${esc(r.rem)}</td></tr>`;}).join('');
     const now=new Date(),pd=String(now.getDate()).padStart(2,'0')+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+now.getFullYear();
     $('printArea').innerHTML=`<div class="rep land">
       <div class="co">Akij Textile Mills Limited</div>
@@ -609,7 +625,7 @@
       <div class="rt">LAB Dyeing Recipe &amp; Costing - Records Report</div>
       <div class="meta"><div></div><div style="white-space:nowrap"><b>Print Date:</b> ${pd}</div></div>
       <table class="rt2 small">
-        <thead><tr><th style="width:34px">SL</th><th>Date</th><th>Buyer</th><th>Shade Name</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th class="r">Cost/Kg ($)</th><th>Remarks</th></tr></thead>
+        <thead><tr><th style="width:34px">SL</th><th>Date</th><th>Buyer</th><th>Shade Name</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th class="r">Total Shade%</th><th class="r">Cost/Kg ($)</th><th>Remarks</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
       <div class="sign">
