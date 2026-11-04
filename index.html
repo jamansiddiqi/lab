@@ -169,10 +169,10 @@
     </table>
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
   </div>
-
+  
   <footer style="
     background-color: #f8fafc;
-    color: #073f8d;
+    color: #ff3b30;
     text-align: center;
     padding: 0px 0px;
     font-family: Arial, Helvetica, sans-serif;
@@ -182,9 +182,10 @@
     border-top: 1px solid #e2e8f0;
 ">
     <p style="margin: 0; line-height: 2;">
-       Marketing person added, copy function modified, dyes named added in reports. If there are any issues, inform me. -- Jaman Siddiqi
+       copy issue has been solved, make edit and input dyes amount%. If there are any issues, inform me. -- Jaman Siddiqi
     </p>
 </footer>
+
   
 </main>
 
@@ -589,7 +590,7 @@
     const id='r'+Date.now();
     const copy=JSON.parse(JSON.stringify(r));
     copy.id=id;copy.locked=false;copy.by=user;copy.at=new Date().toISOString();
-    copy.shade='';copy.lab='';copy.dyes=[];
+    copy.dyes=(copy.dyes||[]).map(d=>({...d,pct:''}));
     delete copy.modBy;delete copy.modAt;
     db.records.push(copy);selId=id;render();
     if(await saveDB())toast('Record copied');
@@ -602,7 +603,7 @@
     const dt=s=>{if(!s)return '';const p=s.split('-');return p.length===3?`${p[2]}-${p[1]}-${p[0]}`:s;};
     const _totCost=costOf(r);
     const noteHtml=_totCost>=0.3?`<div class="costnote">
-        <p>Please be informed that our lab recipe cost has reached <b>USD ${_totCost.toFixed(2)}/Kg</b>, which is higher than our normal costing range 0.2$.</p>
+        <p>Please be informed that our lab recipe cost has reached <b>USD ${_totCost.toFixed(2)}</b>, which is higher than our normal costing range.</p>
         <p>This increased cost is affecting our target costing. Therefore, we need to review the current pricing and take necessary steps to negotiate a price increase with the buyer to cover the additional cost.</p>
         <p>Your kind support and cooperation are highly appreciated to resolve this issue.</p>
       </div>`:'';
