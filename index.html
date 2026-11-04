@@ -149,7 +149,7 @@
   <button id="bEdit">Edit</button>
   <button id="bView">View</button>
   <button id="bPrint">Print</button>
-  <button id="bRepPrint" disabled >Report Print</button>
+  <button id="bRepPrint" style="cursor: not-allowed;" disabled title="Under maintenance, wait for completions.">Report Print</button>
   <button id="bDyeUp">Dyes Upload</button>
   <button id="bDyeView">Dyes View</button>
   <button id="bLock">Lock</button>
@@ -169,6 +169,23 @@
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
   </div>
 </main>
+
+  <footer style="
+    background-color: #f8fafc;
+    color: #073f8d;
+    text-align: center;
+    padding: 0px 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    border-top: 1px solid #e2e8f0;
+">
+    <p style="margin: 0; line-height: 2;">
+        Please keep a regular backup of your file or save it by email. -- Jaman Siddiqi
+    </p>
+</footer>
+  
 
 <!-- Login popup -->
 <div class="overlay show" id="loginOv">
