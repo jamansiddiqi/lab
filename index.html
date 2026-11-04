@@ -150,7 +150,7 @@
   <button id="bEdit">Edit</button>
   <button id="bView">View</button>
   <button id="bPrint">Print</button>
-  <button id="bRepPrint">Report Print</button>
+  <button id="bRepPrint" style="cursor: not-allowed;" disabled title="Under maintenance, Please wait">Report Print</button>
   <button id="bDyeUp">Dyes Upload</button>
   <button id="bDyeView">Dyes View</button>
   <button id="bLock">Lock</button>
@@ -169,10 +169,11 @@
     </table>
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
   </div>
-  
-  <footer style="
+
+
+   <footer style="
     background-color: #f8fafc;
-    color: #ff3b30;
+    color: #1CAD67;
     text-align: center;
     padding: 0px 0px;
     font-family: Arial, Helvetica, sans-serif;
@@ -333,6 +334,8 @@
   /* "  karim   mia " -> "Karim Mia" */
   const titleCase=s=>String(s||'').trim().replace(/\s+/g,' ').toLowerCase().replace(/(^|[\s.\-'])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
   const digits=s=>String(s??'').replace(/\D/g,'');
+  /* "anisur rahman" -> "Anisur rahman" (only the very first letter capitalized) */
+  const capFirst=s=>{const t=String(s??'').trim().replace(/\s+/g,' ');return t?t.charAt(0).toUpperCase()+t.slice(1):t;};
   /* "AVITERA SKY SE" -> "Sky SE" (drop first word, title-case only the new first word) */
   const dropFirstWord=s=>{
     const parts=String(s||'').trim().split(/\s+/);
@@ -517,7 +520,7 @@
   $('recCancel').onclick=()=>$('recOv').classList.remove('show');
   $('recForm').addEventListener('submit',async e=>{
     e.preventDefault();
-    const data={date:$('fDate').value,mkt:$('fMkt').value.trim(),buyer:$('fBuyer').value.trim(),shade:$('fShade').value.trim(),count:$('fCount').value.trim(),pre:$('fPre').value,lab:digits($('fLab').value),rem:$('fRem').value.trim(),dyes:formDyes.map(d=>({name:d.name,pct:d.pct,price:d.price}))};
+    const data={date:$('fDate').value,mkt:capFirst($('fMkt').value),buyer:capFirst($('fBuyer').value),shade:capFirst($('fShade').value),count:$('fCount').value.trim(),pre:$('fPre').value,lab:digits($('fLab').value),rem:$('fRem').value.trim(),dyes:formDyes.map(d=>({name:d.name,pct:d.pct,price:d.price}))};
     if(editId){Object.assign(db.records.find(x=>x.id===editId),data,{modBy:user,modAt:new Date().toISOString()});}
     else{const id='r'+Date.now();db.records.push({id,...data,locked:false,by:user,at:new Date().toISOString()});selId=id;}
     $('recOv').classList.remove('show');render();
@@ -658,10 +661,11 @@
   $('bRepPrint').onclick=()=>{
     const list=visible();
     if(!list.length){toast('No records to print');return;}
+    const dt2=s=>{const f=dt(s);const p=f.split('-');return p.length===3?p[0]+'-'+p[1]+'-'+p[2].slice(-2):f;};
     const rows=list.map((x,i)=>{const r=x.r;
       const dyeHtml=(r.dyes||[]).map(d=>esc(dropFirstWord(d.name))).join(', ');
-      return `<tr><td>${i+1}</td><td>${esc(dt(r.date))}</td><td>${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td class="dyelist">${dyeHtml}</td><td class="r">${pctOf(r).toFixed(2)}%</td><td class="r">${costOf(r).toFixed(3)} $</td><td>${esc(r.rem)}</td></tr>`;}).join('');
-    const now=new Date(),pd=String(now.getDate()).padStart(2,'0')+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+now.getFullYear();
+      return `<tr><td>${i+1}</td><td>${esc(dt2(r.date))}</td><td>${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td class="dyelist">${dyeHtml}</td><td class="r">${pctOf(r).toFixed(2)}%</td><td class="r">${costOf(r).toFixed(3)} $</td><td>${esc(r.rem)}</td></tr>`;}).join('');
+    const now=new Date(),pd=String(now.getDate()).padStart(2,'0')+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getFullYear()).slice(-2);
     $('printArea').innerHTML=`<div class="rep land">
       <div class="co">Akij Textile Mills Limited</div>
       <div class="un">Yarn Dyeing Unit</div>
