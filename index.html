@@ -602,7 +602,7 @@
     const dt=s=>{if(!s)return '';const p=s.split('-');return p.length===3?`${p[2]}-${p[1]}-${p[0]}`:s;};
     const _totCost=costOf(r);
     const noteHtml=_totCost>=0.3?`<div class="costnote">
-        <p>Please be informed that our lab recipe cost has reached <b>USD ${_totCost.toFixed(2)}/Kg</b>, which is higher than our normal costing range is 0.2$.</p>
+        <p>Please be informed that our lab recipe cost has reached <b>USD ${_totCost.toFixed(2)}/Kg</b>, which is higher than our normal costing range 0.2$.</p>
         <p>This increased cost is affecting our target costing. Therefore, we need to review the current pricing and take necessary steps to negotiate a price increase with the buyer to cover the additional cost.</p>
         <p>Your kind support and cooperation are highly appreciated to resolve this issue.</p>
       </div>`:'';
