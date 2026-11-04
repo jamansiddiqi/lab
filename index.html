@@ -73,6 +73,7 @@
   .btn.sm{padding:5px 12px;font-size:12px}
   .btn.red{background:var(--danger)}
   .btn:hover{filter:brightness(.93)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
   .note{font-size:12px;color:#8a5a00;background:#fff6dd;border:1px solid #f0dca0;padding:8px 10px;border-radius:4px;margin-top:12px}
   .toast{position:fixed;bottom:18px;right:18px;background:var(--navy);color:#fff;padding:10px 16px;border-radius:4px;font-size:13px;opacity:0;transition:.3s;z-index:99;max-width:420px}
   .toast.show{opacity:1}
@@ -108,6 +109,9 @@
   .rep table.rt2 th{background:#e5e5e5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .rep table.rt2 td.r,.rep table.rt2 th.r{text-align:right}
   .rep .tot td{font-weight:700}
+  .rep .costnote{margin-top:16px;padding:10px 14px;border:1px solid #000;border-left:5px solid #d62f2f;font-size:13px;line-height:1.5}
+  .rep .costnote p{margin:0 0 8px}
+  .rep .costnote p:last-child{margin-bottom:0}
   .rep table.dyetable th,.rep table.dyetable td{font-weight:700;color:#000}
   .rep .sign{margin-top:100px;display:flex;justify-content:space-between;gap:30px;font-size:14px}
   .rep .sign div{flex:1;text-align:center}
@@ -145,7 +149,7 @@
   <button id="bEdit">Edit</button>
   <button id="bView">View</button>
   <button id="bPrint">Print</button>
-  <button id="bRepPrint" disabled title="Under Maintenance, trying to improve to add dye names" >Report Print</button>
+  <button id="bRepPrint">Report Print</button>
   <button id="bDyeUp">Dyes Upload</button>
   <button id="bDyeView">Dyes View</button>
   <button id="bLock">Lock</button>
@@ -178,8 +182,8 @@
       <div class="note">Database file <b>lab recipe data.json</b> is not connected yet. Select it once - next time it connects automatically.</div>
       <div class="actions">
         <button type="button" class="btn" id="chOpen">Select existing file</button>
-        <button type="button" class="btn sec" id="chNew"  disabled >Create new file</button>
-        <button type="button" class="btn sec" id="chSkip"  disabled >Skip</button>
+        <button type="button" class="btn sec" id="chNew" disabled>Create new file</button>
+        <button type="button" class="btn sec" id="chSkip" disabled>Skip</button>
       </div>
     </div>
   </form>
@@ -451,7 +455,7 @@
     const tb=$('dyeRows');tb.innerHTML='';
     formDyes.forEach((d,i)=>{
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${esc(d.name)}</td><td><input type="number" step="any" min="0" value="${esc(pctFmt(d.pct))}" data-k="pct"</td><td><input type="number" step="any" min="0" value="${esc(p2(d.price))}" data-k="price"></td><td><button type="button" class="btn sm red">&times;</button></td>`;
+      tr.innerHTML=`<td>${esc(d.name)}</td><td><input type="number" step="any" min="0" value="${esc(pctFmt(d.pct))}" data-k="pct"></td><td><input type="number" step="any" min="0" value="${esc(p2(d.price))}" data-k="price"></td><td><button type="button" class="btn sm red">&times;</button></td>`;
       tr.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{
         let v=inp.value;
         if(inp.dataset.k==='pct'&&/^\./.test(v)){v='0'+v;inp.value=v;}
@@ -514,7 +518,7 @@
     const rows=[['Date',r.date],['Buyer',r.buyer],['Shade Name',r.shade],['Count',r.count],['Pretreatment',r.pre],['Labdip No',r.lab],['Remarks',r.rem],['Locked',r.locked?'Yes':'No'],['Entry By',r.by],['Created at',fmtFull(r.at)]];
     let h=rows.map(x=>`<div class="viewrow"><b>${x[0]}</b><span>${esc(x[1])}</span></div>`).join('');
     h+=`<div class="dyebox" style="margin-top:12px"><table class="dyetbl"><thead><tr><th>Dyes Name</th><th>Shade %</th><th>Price</th><th>Cost</th></tr></thead><tbody>`+
-      (r.dyes||[]).map(d=>`<tr><td>${esc(d.name)}</td><td>${esc(d.pct)}</td><td>${esc(p2(d.price))}</td><td>${(num(d.price)*num(d.pct)/100).toFixed(3)} $</td></tr>`).join('')+
+      (r.dyes||[]).map(d=>`<tr><td>${esc(d.name)}</td><td>${esc(pctFmt(d.pct))}</td><td>${esc(p2(d.price))}</td><td>${(num(d.price)*num(d.pct)/100).toFixed(3)} $</td></tr>`).join('')+
       `</tbody></table><div class="totalrow"><span>Cost/Kg ($): ${costOf(r).toFixed(3)} $</span><span>Shade% : ${pctOf(r).toFixed(2)}%</span></div></div>`;
     $('viewBody').innerHTML=h;$('viewOv').classList.add('show');
   };
@@ -562,9 +566,15 @@
   $('bPrint').onclick=()=>{
     const r=sel();if(!r)return;
     const dyes=r.dyes||[];
-    const rows=dyes.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d.name)}</td><td class="r">${esc(d.pct)}</td><td class="r">${esc(p2(d.price))}</td><td class="r">${(num(d.price)*num(d.pct)/100).toFixed(3)} $</td></tr>`).join('')
+    const rows=dyes.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d.name)}</td><td class="r">${esc(pctFmt(d.pct))}</td><td class="r">${esc(p2(d.price))}</td><td class="r">${(num(d.price)*num(d.pct)/100).toFixed(3)} $</td></tr>`).join('')
       ||'<tr><td colspan="5" style="text-align:center">No dyes</td></tr>';
     const dt=s=>{if(!s)return '';const p=s.split('-');return p.length===3?`${p[2]}-${p[1]}-${p[0]}`:s;};
+    const _totCost=costOf(r);
+    const noteHtml=_totCost>=0.3?`<div class="costnote">
+        <p>Please be informed that our lab recipe cost has reached <b>USD ${_totCost.toFixed(2)}</b>, which is higher than our normal costing range.</p>
+        <p>This increased cost is affecting our target costing. Therefore, we need to review the current pricing and take necessary steps to negotiate a price increase with the buyer to cover the additional cost.</p>
+        <p>Your kind support and cooperation are highly appreciated to resolve this issue.</p>
+      </div>`:'';
     $('printArea').innerHTML=`<div class="rep">
       <div class="co">Akij Textile Mills Limited</div>
       <div class="un">Yarn Dyeing Unit</div>
@@ -584,6 +594,7 @@
         <thead><tr><th style="width:40px">SL</th><th>Dyes Name</th><th class="r" style="width:90px">Shade %</th><th class="r" style="width:90px">Price</th><th class="r" style="width:110px">Cost ($)</th></tr></thead>
         <tbody>${rows}<tr class="tot"><td colspan="2">Shade% : ${pctOf(r).toFixed(2)}%</td><td colspan="2" class="r">Total Cost/Kg ($)</td><td class="r">${costOf(r).toFixed(3)} $</td></tr></tbody>
       </table>
+      ${noteHtml}
       <div class="sign">
         <div><div class="nm">${esc(user||'')}</div><div class="ln">Prepared By</div></div>
         <div><div class="nm"></div><div class="ln">Checked By</div></div>
