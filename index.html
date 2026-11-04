@@ -106,13 +106,14 @@
   .rep .info b{display:inline-block;width:130px}
   .rep table.rt2{width:100%;border-collapse:collapse;font-size:14px}
   .rep table.rt2 th,.rep table.rt2 td{border:1px solid #000;padding:7px 9px;text-align:left}
-  .rep table.rt2 th{background:#e5e5e5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rep table.rt2 th{background:#e5e5e5;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .rep table.rt2 td.r,.rep table.rt2 th.r{text-align:right}
   .rep .tot td{font-weight:700}
   .rep .costnote{margin-top:16px;padding:10px 14px;border:1px solid #000;border-left:5px solid #d62f2f;font-size:13px;line-height:1.5}
   .rep .costnote p{margin:0 0 8px}
   .rep .costnote p:last-child{margin-bottom:0}
   .rep table.dyetable th,.rep table.dyetable td{font-weight:700;color:#000}
+  .rep .dyelist{font-size:8px;line-height:1.15}
   .rep .sign{margin-top:100px;display:flex;justify-content:space-between;gap:30px;font-size:14px}
   .rep .sign div{flex:1;text-align:center}
   .rep .sign .ln{border-top:1px solid #000;padding-top:6px;font-weight:600}
@@ -143,13 +144,13 @@
 </header>
 
 <div class="toolbar">
-  <input id="qSearch" class="qs" placeholder="Search Buyer / Shade / Labdip No" autocomplete="off">
+  <input id="qSearch" class="qs" placeholder="Search Marketing / Buyer / Shade / Labdip No" autocomplete="off">
   <button id="bAdv">Advance Search</button>
   <button id="bAdd">Add</button>
   <button id="bEdit">Edit</button>
   <button id="bView">View</button>
   <button id="bPrint">Print</button>
-  <button id="bRepPrint" style="cursor: not-allowed;" disabled title="Under maintenance, wait for completions.">Report Print</button>
+  <button id="bRepPrint">Report Print</button>
   <button id="bDyeUp">Dyes Upload</button>
   <button id="bDyeView">Dyes View</button>
   <button id="bLock">Lock</button>
@@ -163,12 +164,11 @@
   <div class="fbar" id="fbar"><span id="fInfo"></span><button type="button" class="btn sm sec" id="fClear">Clear filter</button></div>
   <div class="card">
     <table>
-      <thead><tr><th>#</th><th>Date</th><th>Buyer</th><th>Shade Name</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th>Shade%</th><th>Cost/Kg ($)</th><th>Remarks</th><th>Lock</th><th>Entry By</th></tr></thead>
+      <thead><tr><th>#</th><th>Date</th><th>Marketing Person</th><th>Buyer</th><th>Shade Name</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th>Shade%</th><th>Cost/Kg ($)</th><th>Remarks</th><th>Lock</th><th>Entry By</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
   </div>
-
 
   <footer style="
     background-color: #f8fafc;
@@ -182,13 +182,11 @@
     border-top: 1px solid #e2e8f0;
 ">
     <p style="margin: 0; line-height: 2;">
-        Please keep a regular backup of your file or save it by email. -- Jaman Siddiqi
+       Marketing person added, copy function modified, dyes named added in reports. If there are any issues, inform me. -- Jaman Siddiqi
     </p>
 </footer>
-
-
-  </main>
   
+</main>
 
 <!-- Login popup -->
 <div class="overlay show" id="loginOv">
@@ -216,6 +214,7 @@
     <p>Fill in the details and save.</p>
     <div class="grid2">
       <div><label>Date</label><input type="date" id="fDate" required></div>
+      <div><label>Marketing Person</label><input id="fMkt"></div>
       <div><label>Buyer</label><input id="fBuyer"></div>
       <div><label>Shade Name</label><input id="fShade" required></div>
       <div><label>Yarn Count &amp; Composition</label><input id="fCount"></div>
@@ -292,6 +291,7 @@
       <div><label>Shade% Max</label><input id="aPmax" type="number" step="any" min="0"></div>
       <div><label>Cost/Kg ($) Min</label><input id="aCmin" type="number" step="any" min="0"></div>
       <div><label>Cost/Kg ($) Max</label><input id="aCmax" type="number" step="any" min="0"></div>
+      <div><label>Marketing Person</label><input id="aMkt"></div>
     </div>
     <div class="actions">
       <button type="button" class="btn sec" id="advClose">Close</button>
@@ -332,6 +332,14 @@
   /* "  karim   mia " -> "Karim Mia" */
   const titleCase=s=>String(s||'').trim().replace(/\s+/g,' ').toLowerCase().replace(/(^|[\s.\-'])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
   const digits=s=>String(s??'').replace(/\D/g,'');
+  /* "AVITERA SKY SE" -> "Sky SE" (drop first word, title-case only the new first word) */
+  const dropFirstWord=s=>{
+    const parts=String(s||'').trim().split(/\s+/);
+    if(parts.length<=1)return '';
+    const rest=parts.slice(1);
+    rest[0]=rest[0].charAt(0).toUpperCase()+rest[0].slice(1).toLowerCase();
+    return rest.join(' ');
+  };
   const setPage=o=>{$('pageStyle').textContent='@page{size:A4 '+o+';margin:'+(o==='landscape'?'12mm':'14mm')+'}';};
 
   /* ---------- database ---------- */
@@ -412,10 +420,11 @@
     const q=low(qText).trim(),out=[];
     for(let i=db.records.length-1;i>=0;i--){          // newest first
       const r=db.records[i];
-      if(q&&!(low(r.buyer).includes(q)||low(r.shade).includes(q)||low(r.lab).includes(q)))continue;
+      if(q&&!(low(r.mkt).includes(q)||low(r.buyer).includes(q)||low(r.shade).includes(q)||low(r.lab).includes(q)))continue;
       if(has(adv.from)&&(r.date||'')<adv.from)continue;
       if(has(adv.to)&&(r.date||'')>adv.to)continue;
       if(has(adv.by)&&!low(r.by).includes(low(adv.by).trim()))continue;
+      if(has(adv.mkt)&&!low(r.mkt).includes(low(adv.mkt).trim()))continue;
       if(has(adv.buyer)&&!low(r.buyer).includes(low(adv.buyer).trim()))continue;
       if(has(adv.shade)&&!low(r.shade).includes(low(adv.shade).trim()))continue;
       if(has(adv.count)&&!low(r.count).includes(low(adv.count).trim()))continue;
@@ -438,6 +447,7 @@
     if(has(adv.from))p.push('From: '+dt(adv.from));
     if(has(adv.to))p.push('To: '+dt(adv.to));
     if(has(adv.by))p.push('Entry By: '+adv.by);
+    if(has(adv.mkt))p.push('Marketing Person: '+adv.mkt);
     if(has(adv.buyer))p.push('Buyer: '+adv.buyer);
     if(has(adv.shade))p.push('Shade: '+adv.shade);
     if(has(adv.count))p.push('Count: '+adv.count);
@@ -456,7 +466,7 @@
       const r=x.r,i=x.n-1;
       const tr=document.createElement('tr');if(r.id===selId)tr.className='sel';
       const _c=costOf(r),_cTxt=`${_c.toFixed(3)} $`,_cCell=_c>=0.3?`<span class="costhot" title="Don't Dye, talk with Higher Management.">${_cTxt}</span>`:_cTxt;
-      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.date)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
+      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.date)}</td><td>${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
       tr.addEventListener('click',()=>{selId=r.id;render();});
       tb.appendChild(tr);
     }
@@ -496,7 +506,7 @@
     editId=r?r.id:null;
     $('recTitle').textContent=r?'Edit Recipe':'Add Your Recipe';
     $('fDate').value=r?r.date:new Date().toISOString().slice(0,10);
-    $('fBuyer').value=r?r.buyer:'';$('fShade').value=r?r.shade:'';$('fCount').value=r?r.count:'';
+    $('fMkt').value=r?r.mkt:'';$('fBuyer').value=r?r.buyer:'';$('fShade').value=r?r.shade:'';$('fCount').value=r?r.count:'';
     $('fPre').value=r?r.pre:'Bleach';$('fLab').value=r?r.lab:'';$('fRem').value=r?r.rem:'';
     formDyes=r?JSON.parse(JSON.stringify(r.dyes||[])):[];
     renderDyeRows();$('recOv').classList.add('show');
@@ -506,7 +516,7 @@
   $('recCancel').onclick=()=>$('recOv').classList.remove('show');
   $('recForm').addEventListener('submit',async e=>{
     e.preventDefault();
-    const data={date:$('fDate').value,buyer:$('fBuyer').value.trim(),shade:$('fShade').value.trim(),count:$('fCount').value.trim(),pre:$('fPre').value,lab:digits($('fLab').value),rem:$('fRem').value.trim(),dyes:formDyes.map(d=>({name:d.name,pct:d.pct,price:d.price}))};
+    const data={date:$('fDate').value,mkt:$('fMkt').value.trim(),buyer:$('fBuyer').value.trim(),shade:$('fShade').value.trim(),count:$('fCount').value.trim(),pre:$('fPre').value,lab:digits($('fLab').value),rem:$('fRem').value.trim(),dyes:formDyes.map(d=>({name:d.name,pct:d.pct,price:d.price}))};
     if(editId){Object.assign(db.records.find(x=>x.id===editId),data,{modBy:user,modAt:new Date().toISOString()});}
     else{const id='r'+Date.now();db.records.push({id,...data,locked:false,by:user,at:new Date().toISOString()});selId=id;}
     $('recOv').classList.remove('show');render();
@@ -535,7 +545,7 @@
   /* ---------- View record ---------- */
   $('bView').onclick=()=>{
     const r=sel();if(!r)return;
-    const rows=[['Date',r.date],['Buyer',r.buyer],['Shade Name',r.shade],['Count',r.count],['Pretreatment',r.pre],['Labdip No',r.lab],['Remarks',r.rem],['Locked',r.locked?'Yes':'No'],['Entry By',r.by],['Created at',fmtFull(r.at)]];
+    const rows=[['Date',r.date],['Marketing Person',r.mkt],['Buyer',r.buyer],['Shade Name',r.shade],['Count',r.count],['Pretreatment',r.pre],['Labdip No',r.lab],['Remarks',r.rem],['Locked',r.locked?'Yes':'No'],['Entry By',r.by],['Created at',fmtFull(r.at)]];
     let h=rows.map(x=>`<div class="viewrow"><b>${x[0]}</b><span>${esc(x[1])}</span></div>`).join('');
     h+=`<div class="dyebox" style="margin-top:12px"><table class="dyetbl"><thead><tr><th>Dyes Name</th><th>Shade %</th><th>Price</th><th>Cost</th></tr></thead><tbody>`+
       (r.dyes||[]).map(d=>`<tr><td>${esc(d.name)}</td><td>${esc(pctFmt(d.pct))}</td><td>${esc(p2(d.price))}</td><td>${(num(d.price)*num(d.pct)/100).toFixed(3)} $</td></tr>`).join('')+
@@ -553,10 +563,10 @@
   $('bTableExcel').onclick=()=>{
     const list=visible();
     if(!list.length){toast('No records to download');return;}
-    const data=[['#','Date','Buyer','Shade Name','Yarn Count & Composition','Pretreatment','Labdip No','Shade%','Cost/Kg ($)','Remarks','Entry By','Locked','Dyes Name','Dyes Price','Dye Shade%','Individual Cost/Kg']];
+    const data=[['#','Date','Marketing Person','Buyer','Shade Name','Yarn Count & Composition','Pretreatment','Labdip No','Shade%','Cost/Kg ($)','Remarks','Entry By','Locked','Dyes Name','Dyes Price','Dye Shade%','Individual Cost/Kg']];
     list.forEach((x,i)=>{
       const r=x.r;
-      const base=[i+1,dt(r.date),r.buyer||'',r.shade||'',r.count||'',r.pre||'',r.lab||'',Number(pctOf(r).toFixed(2)),Number(costOf(r).toFixed(3)),r.rem||'',r.by||'',r.locked?'Yes':'No'];
+      const base=[i+1,dt(r.date),r.mkt||'',r.buyer||'',r.shade||'',r.count||'',r.pre||'',r.lab||'',Number(pctOf(r).toFixed(2)),Number(costOf(r).toFixed(3)),r.rem||'',r.by||'',r.locked?'Yes':'No'];
       const dyes=r.dyes||[];
       if(!dyes.length){data.push([...base,'','','','']);}
       else dyes.forEach(d=>{
@@ -565,7 +575,7 @@
     });
     if(window.XLSX){
       const ws=XLSX.utils.aoa_to_sheet(data);
-      ws['!cols']=[{wch:5},{wch:12},{wch:16},{wch:18},{wch:22},{wch:12},{wch:12},{wch:9},{wch:12},{wch:24},{wch:14},{wch:8},{wch:20},{wch:12},{wch:11},{wch:16}];
+      ws['!cols']=[{wch:5},{wch:12},{wch:16},{wch:16},{wch:18},{wch:22},{wch:12},{wch:12},{wch:9},{wch:12},{wch:24},{wch:14},{wch:8},{wch:20},{wch:12},{wch:11},{wch:16}];
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Records');
       XLSX.writeFile(wb,'YD-LAB-Costing_Records.xlsx');
     }else{
@@ -579,6 +589,7 @@
     const id='r'+Date.now();
     const copy=JSON.parse(JSON.stringify(r));
     copy.id=id;copy.locked=false;copy.by=user;copy.at=new Date().toISOString();
+    copy.shade='';copy.lab='';copy.dyes=[];
     delete copy.modBy;delete copy.modAt;
     db.records.push(copy);selId=id;render();
     if(await saveDB())toast('Record copied');
@@ -604,6 +615,7 @@
       <div class="info">
         <div><b>Date</b>: ${esc(dt(r.date))}</div>
         <div><b>Labdip No</b>: ${esc(r.lab)}</div>
+        <div><b>Marketing Person</b>: ${esc(r.mkt)}</div>
         <div><b>Buyer</b>: ${esc(r.buyer)}</div>
         <div><b>Shade Name</b>: ${esc(r.shade)}</div>
         <div><b>Count</b>: ${esc(r.count)}</div>
@@ -629,7 +641,7 @@
   $('fLab').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('aLab').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('qSearch').addEventListener('input',e=>{qText=e.target.value;render();});
-  const AF={aFrom:'from',aTo:'to',aBy:'by',aBuyer:'buyer',aShade:'shade',aCount:'count',aLab:'lab',aPmin:'pmin',aPmax:'pmax',aCmin:'cmin',aCmax:'cmax'};
+  const AF={aFrom:'from',aTo:'to',aBy:'by',aMkt:'mkt',aBuyer:'buyer',aShade:'shade',aCount:'count',aLab:'lab',aPmin:'pmin',aPmax:'pmax',aCmin:'cmin',aCmax:'cmax'};
   $('bAdv').onclick=()=>{for(const k in AF)$(k).value=adv[AF[k]]||'';$('advOv').classList.add('show');};
   $('advClose').onclick=()=>$('advOv').classList.remove('show');
   $('advClear').onclick=()=>{adv={};for(const k in AF)$(k).value='';render();};
@@ -646,7 +658,8 @@
     const list=visible();
     if(!list.length){toast('No records to print');return;}
     const rows=list.map((x,i)=>{const r=x.r;
-      return `<tr><td>${i+1}</td><td>${esc(dt(r.date))}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td class="r">${pctOf(r).toFixed(2)}%</td><td class="r">${costOf(r).toFixed(3)} $</td><td>${esc(r.rem)}</td></tr>`;}).join('');
+      const dyeHtml=(r.dyes||[]).map(d=>esc(dropFirstWord(d.name))).join(', ');
+      return `<tr><td>${i+1}</td><td>${esc(dt(r.date))}</td><td>${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td class="dyelist">${dyeHtml}</td><td class="r">${pctOf(r).toFixed(2)}%</td><td class="r">${costOf(r).toFixed(3)} $</td><td>${esc(r.rem)}</td></tr>`;}).join('');
     const now=new Date(),pd=String(now.getDate()).padStart(2,'0')+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+now.getFullYear();
     $('printArea').innerHTML=`<div class="rep land">
       <div class="co">Akij Textile Mills Limited</div>
@@ -656,9 +669,10 @@
       <div class="rt">LAB Dyeing Recipe &amp; Costing - Records Report</div>
       <div class="meta"><div></div><div style="white-space:nowrap"><b>Print Date:</b> ${pd}</div></div>
       <table class="rt2 small">
-        <thead><tr><th style="width:34px">SL</th><th>Date</th><th>Buyer</th><th>Shade Name</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th class="r">Total Shade%</th><th class="r">Cost/Kg ($)</th><th>Remarks</th></tr></thead>
+        <thead><tr><th style="width:34px">SL</th><th>Date</th><th>Marketing Person</th><th>Buyer</th><th>Shade Name</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th>Dyes Name</th><th class="r">Total Shade%</th><th class="r">Cost/Kg ($)</th><th>Remarks</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
+      <div class="costnote"><p><b>Note:</b> This increased cost is affecting our target costing. Therefore, we need to review the current pricing and take necessary steps to negotiate a price increase with the buyer to cover the additional cost.</p></div>
       <div class="sign">
         <div><div class="nm"></div><div class="ln">Prepared By</div></div>
         <div><div class="nm"></div><div class="ln">Checked By</div></div>
