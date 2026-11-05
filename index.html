@@ -113,7 +113,7 @@
   .rep .costnote p{margin:0 0 8px}
   .rep .costnote p:last-child{margin-bottom:0}
   .rep table.dyetable th,.rep table.dyetable td{font-weight:700;color:#000}
-  .rep .dyelist{font-size:8px;line-height:1.15}
+  .rep .dyelist{font-size:7px;line-height:1.15}
   .rep .sign{margin-top:100px;display:flex;justify-content:space-between;gap:30px;font-size:14px}
   .rep .sign div{flex:1;text-align:center}
   .rep .sign .ln{border-top:1px solid #000;padding-top:6px;font-weight:600}
@@ -150,7 +150,7 @@
   <button id="bEdit">Edit</button>
   <button id="bView">View</button>
   <button id="bPrint">Print</button>
-  <button id="bRepPrint" style="cursor: not-allowed;" disabled title="Under maintenance, Please wait">Report Print</button>
+  <button id="bRepPrint" style="cursor: not-allowed;" disabled title="Under maintenance, Please wait" >Report Print</button>
   <button id="bDyeUp">Dyes Upload</button>
   <button id="bDyeView">Dyes View</button>
   <button id="bLock">Lock</button>
@@ -171,7 +171,7 @@
   </div>
 
 
-   <footer style="
+  <footer style="
     background-color: #f8fafc;
     color: #1CAD67;
     text-align: center;
@@ -187,7 +187,8 @@
     </p>
 </footer>
 
-  
+
+
 </main>
 
 <!-- Login popup -->
@@ -661,11 +662,10 @@
   $('bRepPrint').onclick=()=>{
     const list=visible();
     if(!list.length){toast('No records to print');return;}
-    const dt2=s=>{const f=dt(s);const p=f.split('-');return p.length===3?p[0]+'-'+p[1]+'-'+p[2].slice(-2):f;};
     const rows=list.map((x,i)=>{const r=x.r;
       const dyeHtml=(r.dyes||[]).map(d=>esc(dropFirstWord(d.name))).join(', ');
-      return `<tr><td>${i+1}</td><td>${esc(dt2(r.date))}</td><td>${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td class="dyelist">${dyeHtml}</td><td class="r">${pctOf(r).toFixed(2)}%</td><td class="r">${costOf(r).toFixed(3)} $</td><td>${esc(r.rem)}</td></tr>`;}).join('');
-    const now=new Date(),pd=String(now.getDate()).padStart(2,'0')+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getFullYear()).slice(-2);
+      return `<tr><td>${i+1}</td><td>${esc(dt(r.date))}</td><td>${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td class="dyelist">${dyeHtml}</td><td class="r">${pctOf(r).toFixed(2)}%</td><td class="r">${costOf(r).toFixed(3)} $</td><td>${esc(r.rem)}</td></tr>`;}).join('');
+    const now=new Date(),pd=String(now.getDate()).padStart(2,'0')+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+now.getFullYear();
     $('printArea').innerHTML=`<div class="rep land">
       <div class="co">Akij Textile Mills Limited</div>
       <div class="un">Yarn Dyeing Unit</div>
@@ -674,12 +674,12 @@
       <div class="rt">LAB Dyeing Recipe &amp; Costing - Records Report</div>
       <div class="meta"><div></div><div style="white-space:nowrap"><b>Print Date:</b> ${pd}</div></div>
       <table class="rt2 small">
-        <thead><tr><th style="width:34px">SL</th><th>Date</th><th>Marketing Person</th><th>Buyer</th><th>Shade Name</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th>Dyes Name</th><th class="r">Total Shade%</th><th class="r">Cost/Kg ($)</th><th>Remarks</th></tr></thead>
+        <thead><tr><th style="width:34px">SL</th><th>Date</th><th>Marketing</th><th>Buyer</th><th>Shade Name</th><th>Count</th><th>Pre-Treat</th><th>Labdip No</th><th>Dyes Name</th><th class="r">Shade%</th><th class="r">Cost/Kg ($)</th><th>Remarks</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
       <div class="costnote"><p><b>Note:</b> This increased cost is affecting our target costing. Therefore, we need to review the current pricing and take necessary steps to negotiate a price increase with the buyer to cover the additional cost.</p></div>
       <div class="sign">
-        <div><div class="nm"></div><div class="ln">Prepared By</div></div>
+        <div><div class="nm">Auto-Generated</div><div class="ln">Prepared By</div></div>
         <div><div class="nm"></div><div class="ln">Checked By</div></div>
         <div><div class="nm"></div><div class="ln">Approved By</div></div>
       </div>
