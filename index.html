@@ -150,12 +150,13 @@
   <button id="bEdit">Edit</button>
   <button id="bView">View</button>
   <button id="bPrint">Print</button>
-  <button id="bRepPrint" style="cursor: not-allowed;" disabled title="Under maintenance, Please wait" >Report Print</button>
+  <button id="bRepPrint" style="cursor: not-allowed;" disabled title="Under maintenance, Please wait until solve." >Report Print</button>
   <button id="bDyeUp">Dyes Upload</button>
   <button id="bDyeView">Dyes View</button>
   <button id="bLock">Lock</button>
   <button id="bTableExcel" class="excel">Excel</button>
   <button id="bCopy">Copy</button>
+  <button id="bMail">Mail</button>
   <input type="file" id="dyeFile" accept=".xlsx,.xls,.csv" hidden>
   <div class="status"><span><span class="dot" id="dbDot"></span><span id="dbTxt">Database not connected</span></span><button id="bConn">Connect</button></div>
 </div>
@@ -170,8 +171,7 @@
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
   </div>
 
-
-  <footer style="
+<footer style="
     background-color: #f8fafc;
     color: #1CAD67;
     text-align: center;
@@ -183,12 +183,11 @@
     border-top: 1px solid #e2e8f0;
 ">
     <p style="margin: 0; line-height: 2;">
-       copy issue has been solved; make edit and input dyes amount%. If there are any issues, inform me. -- Jaman Siddiqi
+       Mail button added to send higher cost. If there are any issues, inform me. -- Jaman Siddiqi
     </p>
 </footer>
 
-
-
+  
 </main>
 
 <!-- Login popup -->
@@ -599,19 +598,36 @@
     db.records.push(copy);selId=id;render();
     if(await saveDB())toast('Record copied');
   };
-  $('bPrint').onclick=()=>{
+  $('bMail').onclick=()=>{
     const r=sel();if(!r)return;
+    if(costOf(r)<=0.2){toast('No need to send mail. It\'s safe.');return;}
+    const subject='Regarding Lab Dyeing Recipe Cost and Pricing Review for Buyer '+r.buyer+' (Shade: '+r.shade+')';
+    const body='Dear Concern Team,\n'+
+      'I would like to bring to your attention that our recent laboratory dyeing recipe cost has increased significantly. Below are the key details from the report:\n\n'+
+      '* Labdip No: '+r.lab+'\n'+
+      '* Buyer Name: '+r.buyer+'\n'+
+      '* Marketing Person: '+r.mkt+'\n'+
+      '* Shade Name: '+r.shade+'\n'+
+      '* Count & Composition: '+r.count+'\n'+
+      '* Total Cost/Kg: USD '+costOf(r).toFixed(2)+' (Shade%: '+pctOf(r).toFixed(2)+'%)\n\n\n'+
+      'Please be informed that this cost is higher than our normal costing range (USD 0.20/Kg), which is impacting our target costing. Therefore, we need to review the current pricing and take necessary steps to negotiate a price increase with the buyer to cover this additional cost.\n\n'+
+      'Your kind support and cooperation are highly appreciated to resolve this issue.\n \n'+
+      'Thank You.';
+    const mailto='mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+    window.location.href=mailto;
+  };
+  function buildPrintHtml(r){
     const dyes=r.dyes||[];
     const rows=dyes.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d.name)}</td><td class="r">${esc(pctFmt(d.pct))}</td><td class="r">${esc(p2(d.price))}</td><td class="r">${(num(d.price)*num(d.pct)/100).toFixed(3)} $</td></tr>`).join('')
       ||'<tr><td colspan="5" style="text-align:center">No dyes</td></tr>';
     const dt=s=>{if(!s)return '';const p=s.split('-');return p.length===3?`${p[2]}-${p[1]}-${p[0]}`:s;};
     const _totCost=costOf(r);
     const noteHtml=_totCost>=0.3?`<div class="costnote">
-        <p>Please be informed that our lab recipe cost has reached <b>USD ${_totCost.toFixed(2)}</b>, which is higher than our normal costing range.</p>
+        <p>Please be informed that our lab recipe cost has reached <b>USD ${_totCost.toFixed(2)}/Kg</b>, which is higher than our normal costing range 0.2$.</p>
         <p>This increased cost is affecting our target costing. Therefore, we need to review the current pricing and take necessary steps to negotiate a price increase with the buyer to cover the additional cost.</p>
         <p>Your kind support and cooperation are highly appreciated to resolve this issue.</p>
       </div>`:'';
-    $('printArea').innerHTML=`<div class="rep">
+    return `<div class="rep">
       <div class="co">Akij Textile Mills Limited</div>
       <div class="un">Yarn Dyeing Unit</div>
       <div class="lb">Laboratory</div>
@@ -638,6 +654,10 @@
         <div><div class="nm"></div><div class="ln">Approved By</div></div>
       </div>
     </div>`;
+  }
+  $('bPrint').onclick=()=>{
+    const r=sel();if(!r)return;
+    $('printArea').innerHTML=buildPrintHtml(r);
     setPage('portrait');
     window.print();
   };
