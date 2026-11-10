@@ -175,6 +175,106 @@
     </table>
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
   </div>
+
+
+  <footer id="yarn-footer">
+  <div class="footer-content">
+    <span class="status-dot"></span>
+    <span class="footer-label">লক্ষনীয় </span>
+    <span class="footer-divider">|</span>
+    <span id="footer-message">Welcome to Yarn Dyeing LAB.</span>
+    <span class="footer-icon">✦</span>
+  </div>
+</footer>
+
+<style>
+#yarn-footer {
+  background: linear-gradient(90deg, #f8fafc, #ecfdf5, #f8fafc);
+  border-top: 1px solid #d1fae5;
+  padding: 9px 12px;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  letter-spacing: .4px;
+}
+
+.footer-label {
+  color: #059669;
+  font-weight: 700;
+}
+
+.footer-divider {
+  color: #94a3b8;
+}
+
+#footer-message {
+  color: #334155;
+  font-weight: 500;
+  transition: opacity .4s ease;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulse 1.5s infinite;
+}
+
+.footer-icon {
+  color: #10b981;
+  animation: rotate 4s linear infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: .4; transform: scale(.8); }
+}
+
+@keyframes rotate {
+  to { transform: rotate(360deg); }
+}
+
+@media(max-width: 480px) {
+  .footer-content {
+    font-size: 11px;
+    gap: 6px;
+  }
+}
+</style>
+
+<script>
+const messages = [
+  "Dyed Chemical এর দাম নিয়মিত আপডেট করূন।",
+  "সেভ করা ফাইলটি নিয়মিত ব্যকআপ রাখুন।",
+  "Cost কমানোর চেষ্টা করূন।",
+  "অতিরিক্ত Cost কতৃপক্ষকে অবগত করূন।"
+];
+
+let index = 0;
+const message = document.getElementById("footer-message");
+
+setInterval(() => {
+  message.style.opacity = 0;
+
+  setTimeout(() => {
+    index = (index + 1) % messages.length;
+    message.textContent = messages[index];
+    message.style.opacity = 1;
+  }, 400);
+
+}, 3500);
+</script>
+
+  
 </main>
 
 <!-- Login popup -->
