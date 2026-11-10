@@ -143,31 +143,31 @@
   </div>
   <div class="userbox">
     <div class="uname"><div class="avatar" id="avatar">U</div><span id="unameTxt"></span></div>
-    <button class="logout" id="logoutBtn">&#x23FB; Log Out</button>
+    <button class="logout" id="logoutBtn" title="Log out of your account">&#x23FB; Log Out</button>
   </div>
 </header>
 
 <div class="toolbar">
   <input id="qSearch" class="qs" placeholder="Search Marketing / Buyer / Shade / Labdip No" autocomplete="off">
-  <button id="bAdv">Advance Search</button>
-  <button id="bAdd">Add</button>
-  <button id="bEdit">Edit</button>
-  <button id="bView">View</button>
-  <button id="bPrint">Print</button>
-  <button id="bRepPrint">Report Print</button>
-  <button id="bDyeUp">Dyes Upload</button>
-  <button id="bDyeView">Dyes View</button>
-  <button id="bLock">Lock</button>
-  <button id="bTableExcel" class="excel">Excel</button>
-  <button id="bCopy">Copy</button>
-  <button id="bMail">Mail</button>
-  <button id="bMultiMail">Multiple Mail</button>
+  <button id="bAdv" title="Open advance search with multiple filter options">Advance Search</button>
+  <button id="bAdd" title="Add a new recipe record">Add</button>
+  <button id="bEdit" title="Edit the selected record">Edit</button>
+  <button id="bView" title="View full details of the selected record">View</button>
+  <button id="bPrint" title="Print the selected record as a recipe report">Print</button>
+  <button id="bRepPrint" title="Print a table report of all records currently shown">Report Print</button>
+  <button id="bDyeUp" title="Upload an Excel file of dyes name &amp; price">Dyes Upload</button>
+  <button id="bDyeView" title="View, search &amp; download the uploaded dyes list">Dyes View</button>
+  <button id="bLock" title="Lock or unlock the selected record from editing">Lock</button>
+  <button id="bTableExcel" class="excel" title="Download the table currently shown as an Excel file">Excel</button>
+  <button id="bCopy" title="Duplicate the selected record as a new row">Copy</button>
+  <button id="bMail" title="Email the selected record's cost details via Outlook">Mail</button>
+  <button id="bMultiMail" title="Email all currently filtered records' cost details + a PDF report">Multiple Mail</button>
   <input type="file" id="dyeFile" accept=".xlsx,.xls,.csv" hidden>
-  <div class="status"><span><span class="dot" id="dbDot"></span><span id="dbTxt">Database not connected</span></span><button id="bConn">Connect</button></div>
+  <div class="status"><span><span class="dot" id="dbDot"></span><span id="dbTxt">Database not connected</span></span><button id="bConn" title="Connect or reconnect to the JSON database file">Connect</div>
 </div>
 
 <main>
-  <div class="fbar" id="fbar"><span id="fInfo"></span><button type="button" class="btn sm sec" id="fClear">Clear filter</button></div>
+  <div class="fbar" id="fbar"><span id="fInfo"></span><button type="button" class="btn sm sec" id="fClear" title="Clear search &amp; filters, show latest records">Clear filter</div>
   <div class="card">
     <table>
       <thead><tr><th>#</th><th>Date</th><th>Marketing Person</th><th>Buyer</th><th>Shade Name</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th>Shade%</th><th>Cost/Kg ($)</th><th>Remarks</th><th>Lock</th><th>Entry By</th></tr></thead>
@@ -184,13 +184,13 @@
     <p>Please enter your name to continue.</p>
     <label>User Name</label>
     <input id="loginName" required placeholder="Write Your Name Only">
-    <div class="actions"><button class="btn" type="submit" id="loginBtn">Login</button></div>
+    <div class="actions"><button class="btn" type="submit" id="loginBtn" title="Log in with this name">Login</button></div>
     <div class="choice" id="choice">
       <div class="note">Database file <b>lab recipe data.json</b> is not connected yet. Select it once - next time it connects automatically.</div>
       <div class="actions">
-        <button type="button" class="btn" id="chOpen">Select existing file</button>
-        <button type="button" class="btn sec" id="chNew" disabled>Create new file</button>
-        <button type="button" class="btn sec" id="chSkip" disabled>Skip</button>
+        <button type="button" class="btn" id="chOpen" title="Browse &amp; select your existing database file">Select existing file</button>
+        <button type="button" class="btn sec" id="chNew" disabled title="Create a brand new database file">Create new file</button>
+        <button type="button" class="btn sec" id="chSkip" disabled title="Continue without connecting a database file">Skip</button>
       </div>
     </div>
   </form>
@@ -203,8 +203,8 @@
     <p>Fill in the details and save.</p>
     <div class="grid2">
       <div><label>Date</label><input type="date" id="fDate" required></div>
-      <div><label>Marketing Person</label><input id="fMkt"></div>
-      <div><label>Buyer</label><input id="fBuyer"></div>
+      <div><label>Marketing Person</label><input id="fMkt" list="dlMkt" autocomplete="off"></div>
+      <div><label>Buyer</label><input id="fBuyer" list="dlBuyer" autocomplete="off"></div>
       <div><label>Shade Name</label><input id="fShade" required></div>
       <div><label>Yarn Count &amp; Composition</label><input id="fCount"></div>
       <div><label>Pretreatment Type</label>
@@ -215,15 +215,15 @@
     <textarea id="fRem" rows="2"></textarea>
     <label>Dyes</label>
     <div class="dyebox">
-      <div class="dyehead"><b>Dyes List</b><button type="button" class="btn sm" id="addDyeBtn">+ Dyes Add</button></div>
+      <div class="dyehead"><b>Dyes List</b><button type="button" class="btn sm" id="addDyeBtn" title="Open the dye picker to add a dye to this recipe">+ Dyes Add</button></div>
       <table class="dyetbl"><thead><tr><th>Dyes Name</th><th style="width:110px">Shade %</th><th style="width:130px">Price</th><th style="width:40px"></th></tr></thead>
       <tbody id="dyeRows"></tbody></table>
       <div class="dyeempty" id="dyeEmpty">No dyes added. Click <b>Dyes Add</b>.</div>
       <div class="totalrow"><span>Shade% : <span id="totPct">0.00</span>%</span><span>Cost/Kg ($): <span id="totCost">0.000</span> $</span></div>
     </div>
     <div class="actions">
-      <button type="button" class="btn danger" id="recCancel">Cancel</button>
-      <button type="submit" class="btn">Save</button>
+      <button type="button" class="btn danger" id="recCancel" title="Discard changes and close this form">Cancel</button>
+      <button type="submit" class="btn" title="Save this recipe record">Save</button>
     </div>
   </form>
 </div>
@@ -234,7 +234,7 @@
     <h2>Select Dyes</h2><p>Search and click a dye to add.</p>
     <input id="pickSearch" placeholder="Search dyes name...">
     <div class="pickList" id="pickList"></div>
-    <div class="actions"><button class="btn sec" id="pickClose">Close</button></div>
+    <div class="actions"><button class="btn sec" id="pickClose" title="Close this dye picker">Close</button></div>
   </div>
 </div>
 
@@ -243,7 +243,7 @@
   <div class="modal wide">
     <h2>View Recipe</h2><p>&nbsp;</p>
     <div id="viewBody"></div>
-    <div class="actions"><button class="btn" id="viewClose">Close</button></div>
+    <div class="actions"><button class="btn" id="viewClose" title="Close this view">Close</button></div>
   </div>
 </div>
 
@@ -253,12 +253,12 @@
     <h2>Dyes List</h2><p id="dvCount"></p>
     <div style="display:flex;gap:8px">
       <input id="dvSearch" placeholder="Search dyes...">
-      <button class="btn" id="dvDown" style="white-space:nowrap">Download Excel</button>
+      <button class="btn" id="dvDown" style="white-space:nowrap" title="Download the dyes list as an Excel file">Download Excel</button>
     </div>
     <div class="card" style="max-height:52vh;margin-top:10px">
       <table><thead><tr><th style="width:60px">#</th><th>Dyes Name</th><th style="width:170px">Price</th></tr></thead><tbody id="dvBody"></tbody></table>
     </div>
-    <div class="actions"><button class="btn sec" id="dvClose">Close</button></div>
+    <div class="actions"><button class="btn sec" id="dvClose" title="Close this dyes list">Close</button></div>
   </div>
 </div>
 
@@ -271,7 +271,7 @@
       <div><label>Date From</label><input type="date" id="aFrom"></div>
       <div><label>Date To</label><input type="date" id="aTo"></div>
       <div><label>Entry By</label><input id="aBy"></div>
-      <div><label>Buyer</label><input id="aBuyer"></div>
+      <div><label>Buyer</label><input id="aBuyer" list="dlBuyer" autocomplete="off"></div>
       <div><label>Shade Name</label><input id="aShade"></div>
       <div><label>Count</label><input id="aCount"></div>
       <div><label>Labdip No</label><input id="aLab" inputmode="numeric"></div>
@@ -280,18 +280,20 @@
       <div><label>Shade% Max</label><input id="aPmax" type="number" step="any" min="0"></div>
       <div><label>Cost/Kg ($) Min</label><input id="aCmin" type="number" step="any" min="0"></div>
       <div><label>Cost/Kg ($) Max</label><input id="aCmax" type="number" step="any" min="0"></div>
-      <div><label>Marketing Person</label><input id="aMkt"></div>
+      <div><label>Marketing Person</label><input id="aMkt" list="dlMkt" autocomplete="off"></div>
     </div>
     <div class="actions">
-      <button type="button" class="btn sec" id="advClose">Close</button>
-      <button type="button" class="btn sec" id="advClear">Clear</button>
-      <button type="submit" class="btn">Search</button>
+      <button type="button" class="btn sec" id="advClose" title="Close without changing the filter">Close</button>
+      <button type="button" class="btn sec" id="advClear" title="Clear all advance search fields">Clear</button>
+      <button type="submit" class="btn" title="Apply these filters to the table">Search</button>
     </div>
   </form>
 </div>
 
 <style id="pageStyle"></style>
 <div id="printArea"></div>
+<datalist id="dlBuyer"></datalist>
+<datalist id="dlMkt"></datalist>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -332,6 +334,13 @@
     return rest.join(' ');
   };
   const setPage=o=>{$('pageStyle').textContent='@page{size:A4 '+o+';margin:'+(o==='landscape'?'12mm':'14mm')+'}';};
+  const MAIL_SIGNATURE='Kind regards,\n'+
+    'Md.Salauddin\n'+
+    'Manager - Yarn Dyeing Lab\n'+
+    'Akij Textile Mills Ltd\n'+
+    'Golora, Charkhanda, Manikgonj\n'+
+    'Mobile:01718886437 (WhatsApp)\n'+
+    'Email Salauddin@akijtextile.com';
 
   /* ---------- database ---------- */
   async function loadFrom(h){
@@ -468,6 +477,13 @@
     $('fbar').classList.toggle('on',on);
     $('fInfo').textContent=on?`Showing ${list.length} of ${db.records.length} records  -  ${filterText()}`:'';
     $('bAdv').classList.toggle('act',advActive());
+    updateSuggestLists();
+  }
+  function updateSuggestLists(){
+    const buyers=[...new Set(db.records.map(r=>(r.buyer||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    const mkts=[...new Set(db.records.map(r=>(r.mkt||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    $('dlBuyer').innerHTML=buyers.map(v=>`<option value="${esc(v)}">`).join('');
+    $('dlMkt').innerHTML=mkts.map(v=>`<option value="${esc(v)}">`).join('');
   }
   function sel(){const r=db.records.find(x=>x.id===selId);if(!r)toast('Please select a row first');return r;}
 
@@ -476,7 +492,7 @@
     const tb=$('dyeRows');tb.innerHTML='';
     formDyes.forEach((d,i)=>{
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${esc(d.name)}</td><td><input type="number" step="any" min="0" value="${esc(pctFmt(d.pct))}" data-k="pct"></td><td><input type="number" step="any" min="0" value="${esc(p2(d.price))}" data-k="price"></td><td><button type="button" class="btn sm red">&times;</button></td>`;
+      tr.innerHTML=`<td>${esc(d.name)}</td><td><input type="number" step="any" min="0" value="${esc(pctFmt(d.pct))}" data-k="pct"></td><td><input type="number" step="any" min="0" value="${esc(p2(d.price))}" data-k="price"></td><td><button type="button" class="btn sm red" title="Remove this dye from the recipe">&times;</button></td>`;
       tr.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{
         let v=inp.value;
         if(inp.dataset.k==='pct'&&/^\./.test(v)){v='0'+v;inp.value=v;}
@@ -589,7 +605,7 @@
     const r=sel();if(!r)return;
     if(costOf(r)<=0.2){toast('No need to send mail. It\'s safe.');return;}
     const subject='Regarding Lab Dyeing Recipe Cost and Pricing Review for Buyer '+r.buyer+' (Shade: '+r.shade+')';
-    const body='Dear Concern Team,\n'+
+    const body='Dear Sir,\nAssalamu Alaikum.\n\n'+
       'I would like to bring to your attention that our recent laboratory dyeing recipe cost has increased significantly. Below are the key details from the report:\n\n'+
       '* Labdip No: '+r.lab+'\n'+
       '* Buyer Name: '+r.buyer+'\n'+
@@ -598,8 +614,8 @@
       '* Count & Composition: '+r.count+'\n'+
       '* Total Cost/Kg: USD '+costOf(r).toFixed(2)+' (Shade%: '+pctOf(r).toFixed(2)+'%)\n\n\n'+
       'Please be informed that this cost is higher than our normal costing range (USD 0.20/Kg), which is impacting our target costing. Therefore, we need to review the current pricing and take necessary steps to negotiate a price increase with the buyer to cover this additional cost.\n\n'+
-      'Your kind support and cooperation are highly appreciated to resolve this issue.\n \n'+
-      'Thank You.';
+      'Your kind support and cooperation are highly appreciated to resolve this issue.'+'\n'.repeat(6)+
+      MAIL_SIGNATURE;
     const mailto='mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
     window.location.href=mailto;
   };
@@ -741,21 +757,15 @@
     }
   }
   $('bMultiMail').onclick=async()=>{
-    const input=prompt('Enter Serial No(s), comma separated (e.g. 1,3,5):');
-    if(!input)return;
-    const nos=[...new Set(input.split(/[,\s]+/).map(s=>s.trim()).filter(Boolean).map(Number))].filter(n=>!isNaN(n)&&n>0);
-    if(!nos.length){toast('No valid serial no entered');return;}
-    const picked=[],invalid=[];
-    nos.forEach(n=>{
-      const r=db.records[n-1];
-      if(r)picked.push({r,n});else invalid.push(n);
-    });
-    if(!picked.length){toast('No matching record found for the given serial no(s)');return;}
-    if(invalid.length)toast('Serial not found: '+invalid.join(', '));
+    if(!(qText.trim()||advActive())){toast('Please filter first all value.');return;}
+    const picked=filtered();
+    if(!picked.length){toast('No matching records found');return;}
+    const below=picked.filter(x=>costOf(x.r)<=0.2);
+    if(below.length){toast(below.length+' Labdip found below 0.2$ cost, please re filter again.');return;}
     picked.sort((a,b)=>a.n-b.n);
     const buyers=[...new Set(picked.map(x=>x.r.buyer))].join(', ');
     const subject='Regarding Lab Dyeing Recipe Cost and Pricing Review - Multiple Records ('+picked.length+' records)';
-    let body='Dear Concern Team,\n'+
+    let body='Dear Sir,\nAssalamu Alaikum.\n\n'+
       'I would like to bring to your attention that the following laboratory dyeing recipe costs have increased significantly. Below are the key details from the report:\n\n';
     picked.forEach((x,i)=>{
       const r=x.r;
@@ -768,8 +778,8 @@
         '* Total Cost/Kg: USD '+costOf(r).toFixed(2)+' (Shade%: '+pctOf(r).toFixed(2)+'%)\n\n';
     });
     body+='Please be informed that these costs are higher than our normal costing range (USD 0.20/Kg), which is impacting our target costing. Therefore, we need to review the current pricing and take necessary steps to negotiate a price increase with the buyer to cover this additional cost.\n\n'+
-      'Your kind support and cooperation are highly appreciated to resolve this issue.\n \n'+
-      'Thank You.';
+      'Your kind support and cooperation are highly appreciated to resolve this issue.'+'\n'.repeat(6)+
+      MAIL_SIGNATURE;
     const mailto='mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
     window.location.href=mailto;
     const fname='LAB_Recipe_MultiMail_'+picked.map(x=>x.n).join('-')+'.pdf';
