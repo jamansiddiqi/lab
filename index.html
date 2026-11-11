@@ -59,21 +59,28 @@
   .overlay.top{z-index:60}
   .overlay.show{display:flex}
   .modal{position:relative;background:#fff;border-radius:8px;padding:24px 26px;width:min(430px,94vw);max-height:94vh;overflow:auto;box-shadow:0 12px 40px rgba(0,0,0,.35)}
-  .modal.wide{width:min(680px,96vw)}
-  #recForm{padding:16px 18px}
-  #recForm h2{font-size:17px;margin-bottom:2px}
-  #recForm p{font-size:11px;margin-bottom:8px}
-  #recForm label{font-size:11px;margin:6px 0 2px}
-  #recForm input,#recForm select,#recForm textarea{padding:5px 8px;font-size:13px}
-  #recForm .grid2{gap:0 10px}
-  #recForm textarea{min-height:34px}
-  #recForm .dyebox{margin-top:4px}
-  #recForm .dyehead{padding:5px 8px}
-  #recForm .dyetbl th{padding:4px 6px;font-size:12px}
-  #recForm .dyetbl td{padding:2px 6px}
-  #recForm .dyetbl input{padding:3px 6px;font-size:12px}
-  #recForm .totalrow{padding:5px 10px;font-size:13px}
-  #recForm .actions{margin-top:10px}
+  .modal.wide{width:min(600px,96vw)}
+  #recForm{padding:12px 14px}
+  #recForm h2{font-size:14px;margin-bottom:1px}
+  #recForm p{font-size:10px;margin-bottom:4px}
+  #recForm label{font-size:10px;margin:3px 0 1px}
+  #recForm input,#recForm select,#recForm textarea{padding:3px 6px;font-size:12px}
+  #recForm .grid2{gap:0 8px}
+  #recForm textarea{min-height:26px}
+  #recForm .dyebox{margin-top:2px}
+  #recForm .dyehead{padding:3px 6px}
+  #recForm .dyetbl th{padding:2px 4px;font-size:11px}
+  #recForm .dyetbl td{padding:1px 4px}
+  #recForm .dyetbl input{padding:2px 4px;font-size:11px}
+  #recForm .totalrow{padding:3px 8px;font-size:12px}
+  #recForm .actions{margin-top:6px}
+  #advForm{padding:14px 16px}
+  #advForm h2{font-size:15px;margin-bottom:1px}
+  #advForm p{font-size:10px;margin-bottom:6px}
+  #advForm label{font-size:10px;margin:5px 0 1px}
+  #advForm input,#advForm select{padding:4px 7px;font-size:12px}
+  #advForm .grid2{gap:0 8px}
+  #advForm .actions{margin-top:8px}
   .modal.xl{width:min(860px,96vw)}
   .modal h2{margin:0 0 4px;color:var(--navy);font-size:20px}
   .modal p{margin:0 0 14px;color:#5b6b7e;font-size:13px}
@@ -243,14 +250,14 @@
     <p>Fill in the details and save.</p>
     <div class="grid2">
       <div><label>Type</label>
-        <select id="fType" required><option value="">Select Type</option><option>InHouse</option><option>Sweater</option><option>Others</option></select></div>
+        <select id="fType" required><option value="">Select Type</option><option>Sweater</option><option>Deskloom</option><option>Nylon</option><option>Fiber</option><option>Space</option><option>Others</option></select></div>
       <div><label>ATML No</label>
         <div class="atmlwrap"><span class="atmlpre">ATML-</span><input id="fAtml" inputmode="numeric" pattern="[0-9]*" autocomplete="off"></div></div>
       <div><label>Date</label><input type="date" id="fDate" required></div>
       <div><label>Marketing Person</label><input id="fMkt" list="dlMkt" autocomplete="off"></div>
       <div><label>Buyer</label><input id="fBuyer" list="dlBuyer" autocomplete="off"></div>
       <div><label>Shade Name</label><input id="fShade" required></div>
-      <div><label>Yarn Count &amp; Composition</label><input id="fCount"></div>
+      <div><label>Yarn Count &amp; Composition</label><input id="fCount" list="dlCount" autocomplete="off"></div>
       <div><label>Pretreatment Type</label>
         <select id="fPre"><option>Bleach</option><option>Scouring</option><option>Grey</option><option>Others</option></select></div>
       <div><label>Labdip No (numbers only)</label><input id="fLab" inputmode="numeric" pattern="[0-9]*" autocomplete="off"></div>
@@ -314,17 +321,19 @@
     <div class="grid2">
       <div><label>Date From</label><input type="date" id="aFrom"></div>
       <div><label>Date To</label><input type="date" id="aTo"></div>
-      <div><label>Entry By</label><input id="aBy"></div>
+      <div><label>Entry By</label><input id="aBy" list="dlBy" autocomplete="off"></div>
       <div><label>Buyer</label><input id="aBuyer" list="dlBuyer" autocomplete="off"></div>
       <div><label>Shade Name</label><input id="aShade"></div>
-      <div><label>Count</label><input id="aCount"></div>
       <div><label>Labdip No</label><input id="aLab" inputmode="numeric"></div>
+      <div><label>Yarn Count &amp; Composition</label><input id="aCount" list="dlCount" autocomplete="off"></div>
       <div></div>
       <div><label>Shade% Min</label><input id="aPmin" type="number" step="any" min="0"></div>
       <div><label>Shade% Max</label><input id="aPmax" type="number" step="any" min="0"></div>
       <div><label>Cost/Kg ($) Min</label><input id="aCmin" type="number" step="any" min="0"></div>
       <div><label>Cost/Kg ($) Max</label><input id="aCmax" type="number" step="any" min="0"></div>
       <div><label>Marketing Person</label><input id="aMkt" list="dlMkt" autocomplete="off"></div>
+      <div><label>Type</label><select id="aType"><option value="">Any</option><option>Sweater</option><option>Deskloom</option><option>Nylon</option><option>Fiber</option><option>Space</option><option>Others</option></select></div>
+      <div><label>ATML No</label><input id="aAtml" inputmode="numeric"></div>
     </div>
     <div class="actions">
       <button type="button" class="btn sec" id="advClose" title="Close without changing the filter">Close</button>
@@ -349,6 +358,8 @@
 <div id="printArea"></div>
 <datalist id="dlBuyer"></datalist>
 <datalist id="dlMkt"></datalist>
+<datalist id="dlCount"></datalist>
+<datalist id="dlBy"></datalist>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -484,6 +495,8 @@
       if(has(adv.shade)&&!low(r.shade).includes(low(adv.shade).trim()))continue;
       if(has(adv.count)&&!low(r.count).includes(low(adv.count).trim()))continue;
       if(has(adv.lab)&&!low(r.lab).includes(low(adv.lab).trim()))continue;
+      if(has(adv.type)&&r.type!==adv.type)continue;
+      if(has(adv.atml)&&!low(r.atml).includes(low(adv.atml).trim()))continue;
       const pc=+pctOf(r).toFixed(2);
       if(has(adv.pmin)&&pc<num(adv.pmin))continue;
       if(has(adv.pmax)&&pc>num(adv.pmax))continue;
@@ -511,6 +524,8 @@
     if(has(adv.pmax))p.push('Shade% max: '+adv.pmax+'%');
     if(has(adv.cmin))p.push('Cost/Kg min: '+adv.cmin+' $');
     if(has(adv.cmax))p.push('Cost/Kg max: '+adv.cmax+' $');
+    if(has(adv.type))p.push('Type: '+adv.type);
+    if(has(adv.atml))p.push('ATML No: '+adv.atml);
     return p.join('  |  ')||'All records';
   }
   function render(){
@@ -544,8 +559,12 @@
   function updateSuggestLists(){
     const buyers=[...new Set(db.records.map(r=>(r.buyer||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
     const mkts=[...new Set(db.records.map(r=>(r.mkt||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    const counts=[...new Set(db.records.map(r=>(r.count||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    const bys=[...new Set(db.records.map(r=>(r.by||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
     $('dlBuyer').innerHTML=buyers.map(v=>`<option value="${esc(v)}">`).join('');
     $('dlMkt').innerHTML=mkts.map(v=>`<option value="${esc(v)}">`).join('');
+    $('dlCount').innerHTML=counts.map(v=>`<option value="${esc(v)}">`).join('');
+    $('dlBy').innerHTML=bys.map(v=>`<option value="${esc(v)}">`).join('');
   }
   function sel(){const r=db.records.find(x=>x.id===selId);if(!r)toast('Please select a row first');return r;}
 
@@ -739,7 +758,7 @@
   $('fAtml').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('aLab').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('qSearch').addEventListener('input',e=>{qText=e.target.value;render();});
-  const AF={aFrom:'from',aTo:'to',aBy:'by',aMkt:'mkt',aBuyer:'buyer',aShade:'shade',aCount:'count',aLab:'lab',aPmin:'pmin',aPmax:'pmax',aCmin:'cmin',aCmax:'cmax'};
+  const AF={aFrom:'from',aTo:'to',aBy:'by',aMkt:'mkt',aBuyer:'buyer',aShade:'shade',aCount:'count',aLab:'lab',aPmin:'pmin',aPmax:'pmax',aCmin:'cmin',aCmax:'cmax',aType:'type',aAtml:'atml'};
   $('bAdv').onclick=()=>{for(const k in AF)$(k).value=adv[AF[k]]||'';$('advOv').classList.add('show');};
   $('advClose').onclick=()=>$('advOv').classList.remove('show');
   $('advClear').onclick=()=>{adv={};for(const k in AF)$(k).value='';render();};
