@@ -31,6 +31,8 @@
   .toolbar button#bTableExcel:hover{background:#176e46;border-color:#176e46}
   .toolbar button#bMultiMail{background:#d62f2f;color:#fff;border-color:#d62f2f}
   .toolbar button#bMultiMail:hover{background:#b21f1f;border-color:#b21f1f}
+  .toolbar button#bWhatsapp{background:#25d366;color:#fff;border-color:#25d366}
+  .toolbar button#bWhatsapp:hover{background:#1ebe57;border-color:#1ebe57}
   .fbar{display:none;align-items:center;gap:10px;margin:8px 0;font-size:12px;color:#5b6b7e}
   .fbar.on{display:flex}
   .card{border-top:0;border-radius:0 0 6px 6px}
@@ -38,7 +40,7 @@
   .status button{padding:4px 10px!important;font-size:12px!important}
   .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#bbb;margin-right:5px}
   .dot.on{background:var(--ok)}
-  main{flex:1;min-height:0;padding:0 20px 16px;display:flex;flex-direction:column}
+  main{flex:1;min-height:0;padding:0 20px 0;display:flex;flex-direction:column}
   .card{background:#fff;border:1px solid var(--line);border-radius:6px;overflow:auto;flex:1;min-height:0}
   table{border-collapse:collapse;width:100%;font-size:12px}
   th{background:var(--navy);color:#fff;text-align:left;padding:5px 7px;position:sticky;top:0;white-space:nowrap;border:1px solid var(--navy)}
@@ -58,11 +60,28 @@
   .overlay.show{display:flex}
   .modal{position:relative;background:#fff;border-radius:8px;padding:24px 26px;width:min(430px,94vw);max-height:94vh;overflow:auto;box-shadow:0 12px 40px rgba(0,0,0,.35)}
   .modal.wide{width:min(680px,96vw)}
+  #recForm{padding:16px 18px}
+  #recForm h2{font-size:17px;margin-bottom:2px}
+  #recForm p{font-size:11px;margin-bottom:8px}
+  #recForm label{font-size:11px;margin:6px 0 2px}
+  #recForm input,#recForm select,#recForm textarea{padding:5px 8px;font-size:13px}
+  #recForm .grid2{gap:0 10px}
+  #recForm textarea{min-height:34px}
+  #recForm .dyebox{margin-top:4px}
+  #recForm .dyehead{padding:5px 8px}
+  #recForm .dyetbl th{padding:4px 6px;font-size:12px}
+  #recForm .dyetbl td{padding:2px 6px}
+  #recForm .dyetbl input{padding:3px 6px;font-size:12px}
+  #recForm .totalrow{padding:5px 10px;font-size:13px}
+  #recForm .actions{margin-top:10px}
   .modal.xl{width:min(860px,96vw)}
   .modal h2{margin:0 0 4px;color:var(--navy);font-size:20px}
   .modal p{margin:0 0 14px;color:#5b6b7e;font-size:13px}
   label{display:block;font-size:12px;font-weight:600;margin:10px 0 4px;color:#3b4a5c}
   input,select,textarea{width:100%;padding:8px 10px;border:1px solid #b9c5d4;border-radius:4px;font-size:14px;font-family:inherit}
+  .atmlwrap{display:flex;align-items:stretch}
+  .atmlwrap .atmlpre{display:flex;align-items:center;padding:0 8px;border:1px solid #b9c5d4;border-right:0;border-radius:4px 0 0 4px;background:#eef2f7;font-size:14px;color:#5b6b7e;white-space:nowrap}
+  .atmlwrap input{border-radius:0 4px 4px 0}
   input:focus,select:focus,textarea:focus{outline:2px solid #9ccbf3;border-color:var(--accent)}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
   .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
@@ -128,10 +147,20 @@
   .rep .meta{display:flex;justify-content:space-between;font-size:13px;margin-bottom:12px;gap:20px}
   @page{size:A4;margin:14mm}
   @media print{
-    header,.toolbar,main,.overlay,.toast{display:none!important}
+    header,.toolbar,main,.overlay,.toast,#yarn-footer{display:none!important}
     body{background:#fff;display:block}
     #printArea{display:block}
   }
+  #yarn-footer{background:linear-gradient(90deg,#f8fafc,#ecfdf5,#f8fafc);border-top:1px solid #d1fae5;padding:9px 12px;font-family:Arial,sans-serif;overflow:hidden;flex:0 0 auto}
+  .footer-content{display:flex;justify-content:center;align-items:center;gap:9px;flex-wrap:wrap;font-size:13px;letter-spacing:.4px}
+  .footer-label{color:#059669;font-weight:700}
+  .footer-divider{color:#94a3b8}
+  #footer-message{color:#334155;font-weight:500;transition:opacity .4s ease}
+  .status-dot{width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;animation:pulse 1.5s infinite}
+  .footer-icon{color:#10b981;animation:rotate 4s linear infinite}
+  @keyframes pulse{50%{opacity:.4;transform:scale(.8)}}
+  @keyframes rotate{to{transform:rotate(360deg)}}
+  @media(max-width:480px){.footer-content{font-size:11px;gap:6px}}
 </style>
 </head>
 <body>
@@ -162,6 +191,7 @@
   <button id="bCopy" title="Duplicate the selected record as a new row">Copy</button>
   <button id="bMail" title="Email the selected record's cost details via Outlook">Mail</button>
   <button id="bMultiMail" title="Email all currently filtered records' cost details + a PDF report">Multiple Mail</button>
+  <button id="bWhatsapp" title="Send the selected record's cost details via WhatsApp (cost must be above 0.2$)">WhatsApp</button>
   <input type="file" id="dyeFile" accept=".xlsx,.xls,.csv" hidden>
   <div class="status"><span><span class="dot" id="dbDot"></span><span id="dbTxt">Database not connected</span></span><button id="bConn" title="Connect or reconnect to the JSON database file">Connect</div>
 </div>
@@ -170,112 +200,22 @@
   <div class="fbar" id="fbar"><span id="fInfo"></span><button type="button" class="btn sm sec" id="fClear" title="Clear search &amp; filters, show latest records">Clear filter</div>
   <div class="card">
     <table>
-      <thead><tr><th>#</th><th>Date</th><th>Marketing Person</th><th>Buyer</th><th>Shade Name</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th>Shade%</th><th>Cost/Kg ($)</th><th>Remarks</th><th>Lock</th><th>Entry By</th></tr></thead>
+      <thead><tr><th>#</th><th>Type</th><th>ATML No</th><th>Date</th><th>Marketing Person</th><th>Buyer</th><th>Shade Name</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th>Shade%</th><th>Cost/Kg ($)</th><th>Remarks</th><th>Lock</th><th>Entry By</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
   </div>
+</main>
 
-
-  <footer id="yarn-footer">
+<footer id="yarn-footer">
   <div class="footer-content">
     <span class="status-dot"></span>
-    <span class="footer-label">লক্ষণীয় </span>
+    <span class="footer-label">লক্ষনীয় </span>
     <span class="footer-divider">|</span>
     <span id="footer-message">Welcome to Yarn Dyeing LAB.</span>
-    <span class="footer-icon">✦</span>
+    <span class="footer-icon">&#10022;</span>
   </div>
 </footer>
-
-<style>
-#yarn-footer {
-  background: linear-gradient(90deg, #f8fafc, #ecfdf5, #f8fafc);
-  border-top: 1px solid #d1fae5;
-  padding: 9px 12px;
-  font-family: Arial, sans-serif;
-  overflow: hidden;
-}
-
-.footer-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 9px;
-  flex-wrap: wrap;
-  font-size: 13px;
-  letter-spacing: .4px;
-}
-
-.footer-label {
-  color: #059669;
-  font-weight: 700;
-}
-
-.footer-divider {
-  color: #94a3b8;
-}
-
-#footer-message {
-  color: #334155;
-  font-weight: 500;
-  transition: opacity .4s ease;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
-  animation: pulse 1.5s infinite;
-}
-
-.footer-icon {
-  color: #10b981;
-  animation: rotate 4s linear infinite;
-}
-
-@keyframes pulse {
-  50% { opacity: .4; transform: scale(.8); }
-}
-
-@keyframes rotate {
-  to { transform: rotate(360deg); }
-}
-
-@media(max-width: 480px) {
-  .footer-content {
-    font-size: 11px;
-    gap: 6px;
-  }
-}
-</style>
-
-<script>
-const messages = [
-  "Dyed Chemical এর দাম নিয়মিত আপডেট করূন।",
-  "সেভ করা ফাইলটি নিয়মিত ব্যকআপ রাখুন।",
-  "Cost কমানোর চেষ্টা করূন।",
-  "অতিরিক্ত Cost কতৃপক্ষকে অবগত করূন।"
-];
-
-let index = 0;
-const message = document.getElementById("footer-message");
-
-setInterval(() => {
-  message.style.opacity = 0;
-
-  setTimeout(() => {
-    index = (index + 1) % messages.length;
-    message.textContent = messages[index];
-    message.style.opacity = 1;
-  }, 400);
-
-}, 3500);
-</script>
-
-  
-</main>
 
 <!-- Login popup -->
 <div class="overlay show" id="loginOv">
@@ -302,6 +242,10 @@ setInterval(() => {
     <h2 id="recTitle">Add Your Recipe</h2>
     <p>Fill in the details and save.</p>
     <div class="grid2">
+      <div><label>Type</label>
+        <select id="fType" required><option value="">Select Type</option><option>InHouse</option><option>Sweater</option><option>Others</option></select></div>
+      <div><label>ATML No</label>
+        <div class="atmlwrap"><span class="atmlpre">ATML-</span><input id="fAtml" inputmode="numeric" pattern="[0-9]*" autocomplete="off"></div></div>
       <div><label>Date</label><input type="date" id="fDate" required></div>
       <div><label>Marketing Person</label><input id="fMkt" list="dlMkt" autocomplete="off"></div>
       <div><label>Buyer</label><input id="fBuyer" list="dlBuyer" autocomplete="off"></div>
@@ -386,6 +330,17 @@ setInterval(() => {
       <button type="button" class="btn sec" id="advClose" title="Close without changing the filter">Close</button>
       <button type="button" class="btn sec" id="advClear" title="Clear all advance search fields">Clear</button>
       <button type="submit" class="btn" title="Apply these filters to the table">Search</button>
+    </div>
+  </form>
+</div>
+
+<div class="overlay" id="mktAskOv">
+  <form class="modal" id="mktAskForm" autocomplete="off">
+    <h2 id="mktAskQ">Marketing Person?</h2>
+    <div><label>Marketing Person</label><input id="mktAskInput" list="dlMkt" autocomplete="off"></div>
+    <div class="actions">
+      <button type="button" class="btn sec" id="mktAskSkip" title="Leave this buyer's Marketing Person blank for now">Skip</button>
+      <button type="submit" class="btn" title="Save this Marketing Person for the buyer">OK</button>
     </div>
   </form>
 </div>
@@ -566,7 +521,7 @@ setInterval(() => {
       const r=x.r,i=x.n-1;
       const tr=document.createElement('tr');if(r.id===selId)tr.className='sel';
       const _c=costOf(r),_cTxt=`${_c.toFixed(3)} $`,_cCell=_c>=0.3?`<span class="costhot" title="Don't Dye, talk with Higher Management.">${_cTxt}</span>`:_cTxt;
-      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.date)}</td><td>${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
+      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.type)}</td><td>${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td>${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
       tr.addEventListener('click',()=>{selId=r.id;render();});
       tb.appendChild(tr);
     }
@@ -578,6 +533,13 @@ setInterval(() => {
     $('fInfo').textContent=on?`Showing ${list.length} of ${db.records.length} records  -  ${filterText()}`:'';
     $('bAdv').classList.toggle('act',advActive());
     updateSuggestLists();
+  }
+  function lastMktForBuyer(buyer,excludeId){
+    const b=(buyer||'').trim().toLowerCase();if(!b)return '';
+    const matches=db.records.filter(r=>r.id!==excludeId&&(r.buyer||'').trim().toLowerCase()===b&&(r.mkt||'').trim());
+    if(!matches.length)return '';
+    matches.sort((a,b2)=>new Date(b2.at||0)-new Date(a.at||0));
+    return matches[0].mkt;
   }
   function updateSuggestLists(){
     const buyers=[...new Set(db.records.map(r=>(r.buyer||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
@@ -612,6 +574,7 @@ setInterval(() => {
   function openForm(r){
     editId=r?r.id:null;
     $('recTitle').textContent=r?'Edit Recipe':'Add Your Recipe';
+    $('fType').value=r?(r.type||''):'';$('fAtml').value=r?(r.atml||''):'';
     $('fDate').value=r?r.date:new Date().toISOString().slice(0,10);
     $('fMkt').value=r?r.mkt:'';$('fBuyer').value=r?r.buyer:'';$('fShade').value=r?r.shade:'';$('fCount').value=r?r.count:'';
     $('fPre').value=r?r.pre:'Bleach';$('fLab').value=r?r.lab:'';$('fRem').value=r?r.rem:'';
@@ -623,7 +586,7 @@ setInterval(() => {
   $('recCancel').onclick=()=>$('recOv').classList.remove('show');
   $('recForm').addEventListener('submit',async e=>{
     e.preventDefault();
-    const data={date:$('fDate').value,mkt:capFirst($('fMkt').value),buyer:capFirst($('fBuyer').value),shade:capFirst($('fShade').value),count:$('fCount').value.trim(),pre:$('fPre').value,lab:digits($('fLab').value),rem:$('fRem').value.trim(),dyes:formDyes.map(d=>({name:d.name,pct:d.pct,price:d.price}))};
+    const data={type:$('fType').value,atml:digits($('fAtml').value),date:$('fDate').value,mkt:capFirst($('fMkt').value),buyer:capFirst($('fBuyer').value),shade:capFirst($('fShade').value),count:$('fCount').value.trim(),pre:$('fPre').value,lab:digits($('fLab').value),rem:$('fRem').value.trim(),dyes:formDyes.map(d=>({name:d.name,pct:d.pct,price:d.price}))};
     if(editId){Object.assign(db.records.find(x=>x.id===editId),data,{modBy:user,modAt:new Date().toISOString()});}
     else{const id='r'+Date.now();db.records.push({id,...data,locked:false,by:user,at:new Date().toISOString()});selId=id;}
     $('recOv').classList.remove('show');render();
@@ -752,8 +715,8 @@ setInterval(() => {
       </table>
       ${noteHtml}
       <div class="sign">
-        <div><div class="nm">${esc(user||'')}</div><div class="ln">Prepared By</div></div>
-        <div><div class="nm"></div><div class="ln">Checked By</div></div>
+        <div><div class="nm">${esc(r.by||'')}</div><div class="ln">Prepared By</div></div>
+        <div><div class="nm">Md. Salauddin (Manager-Lab)</div><div class="ln">Checked By</div></div>
         <div><div class="nm"></div><div class="ln">Approved By</div></div>
       </div>
     </div>`;
@@ -766,7 +729,14 @@ setInterval(() => {
   };
 
   /* ---------- Search / Advance search ---------- */
+  $('fBuyer').addEventListener('change',()=>{
+    if(!$('fMkt').value.trim()){
+      const m=lastMktForBuyer($('fBuyer').value,editId);
+      if(m)$('fMkt').value=m;
+    }
+  });
   $('fLab').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
+  $('fAtml').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('aLab').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('qSearch').addEventListener('input',e=>{qText=e.target.value;render();});
   const AF={aFrom:'from',aTo:'to',aBy:'by',aMkt:'mkt',aBuyer:'buyer',aShade:'shade',aCount:'count',aLab:'lab',aPmin:'pmin',aPmax:'pmax',aCmin:'cmin',aCmax:'cmax'};
@@ -856,10 +826,43 @@ setInterval(() => {
       $('printArea').style.display='none';
     }
   }
+  function askMarketing(buyer){
+    return new Promise(resolve=>{
+      $('mktAskQ').textContent=buyer+' buyer-ar marketing person ke?';
+      $('mktAskInput').value='';
+      $('mktAskOv').classList.add('show');
+      setTimeout(()=>$('mktAskInput').focus(),50);
+      const cleanup=()=>{$('mktAskOv').classList.remove('show');$('mktAskForm').removeEventListener('submit',onSubmit);$('mktAskSkip').removeEventListener('click',onSkip);};
+      const onSubmit=e=>{e.preventDefault();const v=$('mktAskInput').value.trim();cleanup();resolve(v);};
+      const onSkip=()=>{cleanup();resolve('');};
+      $('mktAskForm').addEventListener('submit',onSubmit);
+      $('mktAskSkip').addEventListener('click',onSkip);
+    });
+  }
+  async function backfillMarketing(picked){
+    let changed=false;
+    // Step 1: auto-fill from history for buyers that have a prior marketing person
+    picked.forEach(x=>{
+      if(!(x.r.mkt||'').trim()){
+        const m=lastMktForBuyer(x.r.buyer,x.r.id);
+        if(m){x.r.mkt=m;changed=true;}
+      }
+    });
+    // Step 2: ask one-by-one for buyers that have no history at all
+    const stillMissing=[...new Set(picked.filter(x=>!(x.r.mkt||'').trim()).map(x=>x.r.buyer))];
+    for(const buyer of stillMissing){
+      const ans=await askMarketing(buyer);
+      if(ans){
+        picked.forEach(x=>{if(x.r.buyer===buyer&&!(x.r.mkt||'').trim()){x.r.mkt=ans;changed=true;}});
+      }
+    }
+    if(changed){render();await saveDB();}
+  }
   $('bMultiMail').onclick=async()=>{
     if(!(qText.trim()||advActive())){toast('Please filter first all value.');return;}
     const picked=filtered();
     if(!picked.length){toast('No matching records found');return;}
+    await backfillMarketing(picked);
     const below=picked.filter(x=>costOf(x.r)<=0.2);
     if(below.length){toast(below.length+' Labdip found below 0.2$ cost, please re filter again.');return;}
     picked.sort((a,b)=>a.n-b.n);
@@ -885,6 +888,19 @@ setInterval(() => {
     const fname='LAB_Recipe_MultiMail_'+picked.map(x=>x.n).join('-')+'.pdf';
     const ok=await pdfFromHtml(buildReportHtml(picked),fname);
     if(ok)toast('Mail opened & PDF downloaded - please attach the PDF in Outlook manually.');
+  };
+  $('bWhatsapp').onclick=()=>{
+    const r=sel();if(!r)return;
+    const _c=costOf(r);
+    if(_c<=0.2){toast('No need to send message. It\'s safe.');return;}
+    const text='Buyer: '+r.buyer+'\n'+
+      'Color: '+r.shade+'\n'+
+      'Shade%: '+pctOf(r).toFixed(2)+'%\n'+
+      'Cost: '+_c.toFixed(2)+'$\n\n'+
+      'Please be informed that our lab recipe cost has reached USD '+_c.toFixed(2)+'/Kg, which is higher than our normal costing range 0.2$.\n\n'+
+      'This increased cost is affecting our target costing. Therefore, we need to review the current pricing and take necessary steps to negotiate a price increase with the buyer to cover the additional cost.\n\n'+
+      'Your kind support and cooperation are highly appreciated to resolve this issue.';
+    window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
   };
 
   /* ---------- Dyes Upload (existing dyes keep their saved price) ---------- */
@@ -953,6 +969,26 @@ setInterval(() => {
 
   setStatus(false,'Database not connected');
   setTimeout(()=>$('loginName').focus(),100);
+})();
+(()=>{
+  const messages=[
+    "Dyed Chemical এর দাম নিয়মিত আপডেট করূন।",
+    "সেভ করা ফাইলটি নিয়মিত ব্যকআপ রাখুন।",
+    "Cost কমানোর চেষ্টা করূন।",
+    "অতিরিক্ত Cost কতৃপক্ষকে অবগত করূন।"
+  ];
+  let idx=0;
+  const msgEl=document.getElementById('footer-message');
+  if(msgEl){
+    setInterval(()=>{
+      msgEl.style.opacity=0;
+      setTimeout(()=>{
+        idx=(idx+1)%messages.length;
+        msgEl.textContent=messages[idx];
+        msgEl.style.opacity=1;
+      },400);
+    },3500);
+  }
 })();
 </script>
 </body>
