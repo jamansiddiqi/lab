@@ -132,6 +132,16 @@
   .ldf-vals{display:flex}
   .ldf-vals>div{flex:1;padding:4px;text-align:center;font-size:11px;font-weight:600}
   .ldf-vals>div:first-child{border-right:1px solid #000;flex:0 0 35%;background:#fffb8f}
+  .tcm-page{min-height:285mm;width:210mm;max-width:100%;margin:0 auto 14px;background:#fff;padding:8px 10px 10px;box-shadow:0 1px 4px rgba(0,0,0,.15);box-sizing:border-box;font-family:Arial,sans-serif;color:#000;display:flex;flex-direction:column}
+  .tcm-info{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px}
+  .tcm-info td{border:1px solid #000;padding:4px 6px}
+  .tcm-info td.lbl{font-weight:600;width:22%;background:#f3f4f6}
+  .tcm-grid{width:100%;border-collapse:collapse;display:flex;flex-direction:column;flex:1;border-top:1px solid #000;border-left:1px solid #000}
+  .tcm-grid tbody{display:flex;flex-direction:column;width:100%;flex:1}
+  .tcm-grid tr{display:flex;width:100%;flex:1}
+  .tcm-grid td{border-top:none;border-left:none;border-right:1px solid #000;border-bottom:1px solid #000;width:50%;padding:8px;vertical-align:top;display:flex;flex-direction:column}
+  .tcm-opt-label{font-weight:700;text-decoration:underline;font-size:14px;margin-bottom:6px}
+  .tcm-opt-box{flex:1}
   @media print{
     .ldf-page{box-shadow:none;margin:0 auto}
     .ldf-page:not(:last-of-type){page-break-after:always}
@@ -417,6 +427,7 @@
     <h2 class="ldf-title">Print Your Lab Dip Submission.</h2>
     <div class="fmtbtns">
       <button type="button" class="btn" id="btnAtmlCode">ATML Code</button>
+      <button type="button" class="btn" id="btn10cm">10cm</button>
     </div>
     <div id="fmtContent"></div>
     <div class="actions">
@@ -1038,6 +1049,48 @@
     });
     return html;
   }
+  /* ---------- 10cm: single Labdip No swatch submission page ---------- */
+  function buildTenCmPage(r){
+    return `<div class="tcm-page">
+        <div class="ldf-head">
+          <div class="toprow">
+            <img class="logo" src="https://raw.githubusercontent.com/jamansiddiqi/lab/main/Logo.jpg" onerror="this.onerror=null;this.src='https://placehold.co/90x44/ffffff/0b2c7e?text=Akij';">
+            <div class="txtcol">
+              <div class="co">Akij Textile Mills Ltd</div>
+              <div class="addr">Golora, Manikgonj</div>
+            </div>
+          </div>
+          <div class="ft">Lab dip Submission Form</div>
+        </div>
+        <table class="tcm-info">
+          <tr><td class="lbl">Party:</td><td>${esc(r.buyer)}</td><td class="lbl">Date</td><td>${esc(dt(r.date))}</td></tr>
+          <tr><td class="lbl">Buyer</td><td>${esc(r.buyer)}</td><td class="lbl">Yarn Composition</td><td>${esc(r.count)}</td></tr>
+          <tr><td class="lbl">Color Name/Pantone NO:</td><td>${esc(r.shade)}</td><td colspan="2">${esc(r.pantone||'')}</td></tr>
+          <tr><td class="lbl">Lab Dip No</td><td colspan="3">${esc(r.lab)}</td></tr>
+        </table>
+        <table class="tcm-grid">
+          <tr>
+            <td><div class="tcm-opt-label">Option: A</div><div class="tcm-opt-box"></div></td>
+            <td><div class="tcm-opt-label">Option: B</div><div class="tcm-opt-box"></div></td>
+          </tr>
+          <tr>
+            <td><div class="tcm-opt-label">Option: C</div><div class="tcm-opt-box"></div></td>
+            <td><div class="tcm-opt-label">Option: D</div><div class="tcm-opt-box"></div></td>
+          </tr>
+        </table>
+      </div>`;
+  }
+  $('btn10cm').onclick=()=>{
+    const input=prompt('Enter Labdip No (number only):');
+    if(input===null)return;
+    const d=digits(input);
+    if(!d){toast('Please enter a valid Labdip No');return;}
+    const matches=db.records.filter(r=>(r.lab||'')===d);
+    if(!matches.length){toast('No record found for Labdip No '+d);return;}
+    matches.sort((a,b)=>new Date(b.at||0)-new Date(a.at||0));
+    $('fmtContent').innerHTML=buildTenCmPage(matches[0]);
+    $('fmtPrint').style.display='inline-block';
+  };
   $('bFormat').onclick=()=>{
     $('fmtContent').innerHTML='';
     $('fmtPrint').style.display='none';
