@@ -118,8 +118,11 @@
   .ldf-grid tbody{display:flex;flex-direction:column;width:100%;flex:1}
   .ldf-grid tbody tr{display:flex;width:100%;flex:1}
   .ldf-grid td{border-top:none;border-left:none;border-right:1px solid #000;border-bottom:1px solid #000;vertical-align:top;padding:0}
-  .ldf-grid .main{width:37%;display:flex;flex-direction:column}
+  .ldf-grid .main{width:37%}
+  .ldf-grid td.main{display:flex;flex-direction:column}
   .ldf-grid .opt{width:21%}
+  .ldf-navbtn{display:inline;margin:0 3px;padding:0;font-size:10px;line-height:1;border:none;background:none;color:#000;cursor:pointer;font-weight:700;vertical-align:baseline}
+  .ldf-navbtn:hover{color:#444}
   .ldf-mainwrap{display:flex;flex-direction:column;width:100%;height:100%}
   .ldf-cname-h{border-bottom:1px solid #000;background:#f3f4f6;padding:4px;text-align:center;font-size:10px;color:#000;font-weight:700}
   .ldf-cnamewrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px}
@@ -142,9 +145,33 @@
   .tcm-grid td{border-top:none;border-left:none;border-right:1px solid #000;border-bottom:1px solid #000;width:50%;padding:8px;vertical-align:top;display:flex;flex-direction:column}
   .tcm-opt-label{font-weight:700;text-decoration:underline;font-size:14px;margin-bottom:6px}
   .tcm-opt-box{flex:1}
+  .env-page{min-height:285mm;width:210mm;max-width:100%;margin:0 auto 14px;background:#fff;padding:8px 10px 10px;box-shadow:0 1px 4px rgba(0,0,0,.15);box-sizing:border-box;font-family:Arial,sans-serif;color:#000;display:flex;flex-direction:column;gap:5mm}
+  .env-copy{height:87mm;flex:0 0 87mm;display:flex;flex-direction:column;position:relative;padding:4px 2px}
+  .env-chk{position:absolute;top:2px;right:0;display:flex;align-items:center;gap:4px;font-size:10px;background:#fffbe6;border:1px solid #c9a227;border-radius:3px;padding:2px 7px;z-index:2}
+  .env-chk input{width:14px;height:14px;margin:0}
+  .env-mid{display:flex;flex:1;gap:0}
+  .env-from,.env-to{flex:1;border:1px solid #000;padding:10px 14px}
+  .env-from{display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .env-from input{border:none;outline:none;font-weight:700;font-size:13px;background:transparent;color:#000;padding:1px 0}
+  .env-to{display:flex;flex-direction:column;gap:6px}
+  .env-to .env-date-line{font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px}
+  .env-to .env-date-line input{border:none;border-bottom:1px solid #999;outline:none;font-weight:700;font-size:13px;background:transparent;color:#000;width:110px;text-align:left}
+  .env-to .to-row{display:flex;align-items:center;gap:10px}
+  .env-to .totxt{font-weight:700;text-decoration:underline;font-size:17px;white-space:nowrap}
+  .env-to .to-name-inline{flex:1;border:none;outline:none;font-weight:700;font-size:17px;text-align:left;background:transparent;color:#000}
+  .env-to .attnrow,.env-to .yarnrow{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
+  .env-to .attnrow input,.env-to .yarnrow input{flex:1;border:none;border-bottom:1px solid #999;outline:none;font-size:13px;font-weight:700;background:transparent;color:#000}
+  .env-bottom{margin-top:6px}
+  .env-bottom table{width:100%;border-collapse:collapse;font-size:12px}
+  .env-bottom td{border:1px solid #000;padding:3px 8px}
+  .env-bottom td.lbl{font-weight:700;width:25%;vertical-align:middle;text-align:center}
+  .env-bottom input{width:100%;border:none;outline:none;font-weight:600;font-size:12px;background:transparent;color:#000}
+  .env-bottom td.lbl input{font-weight:700;text-align:center}
   @media print{
     .ldf-page{box-shadow:none;margin:0 auto}
     .ldf-page:not(:last-of-type){page-break-after:always}
+    .ldf-navbtn{display:none!important}
+    .env-chk{display:none!important}
   }
   .modal.xl{width:min(860px,96vw)}
   .modal h2{margin:0 0 4px;color:var(--navy);font-size:20px}
@@ -428,6 +455,8 @@
     <div class="fmtbtns">
       <button type="button" class="btn" id="btnAtmlCode">ATML Code</button>
       <button type="button" class="btn" id="btn10cm">10cm</button>
+      <button type="button" class="btn" id="btnSweater1">Sweater1</button>
+      <button type="button" class="btn" id="btnEnvelope">Envelope</button>
     </div>
     <div id="fmtContent"></div>
     <div class="actions">
@@ -483,6 +512,12 @@
     return rest.join(' ');
   };
   const setPage=o=>{$('pageStyle').textContent='@page{size:A4 '+o+';margin:'+(o==='landscape'?'12mm':'14mm')+'}';};
+  /* "40/1 100% Ctn Cwc" -> {num:'40/1', comp:'100% Ctn Cwc'} */
+  const splitYarnCount=s=>{
+    const m=String(s||'').trim().match(/^(\d+\s*\/\s*\d+)\s*(.*)$/);
+    if(m)return {num:m[1].replace(/\s+/g,''),comp:m[2].trim()};
+    return {num:'',comp:String(s||'').trim()};
+  };
   const MAIL_SIGNATURE='Kind regards,\n'+
     'Md.Salauddin\n'+
     'Manager - Yarn Dyeing Lab\n'+
@@ -1006,11 +1041,13 @@
     const groups=[];
     for(let i=0;i<records.length;i+=4)groups.push(records.slice(i,i+4));
     if(!groups.length)groups.push([]);
-    const subDate=records.length?dt(records[0].date):'';
-    const buyer=records.length?records[0].buyer:'';
-    const yarnTypes=[...new Set(records.map(r=>(r.count||'').trim()).filter(Boolean))].join(', ');
     let html='';
     groups.forEach(group=>{
+      const gRecs=group.filter(Boolean);
+      const subDate=gRecs.length?dt(gRecs[0].date):'';
+      const buyer=[...new Set(gRecs.map(r=>r.buyer).filter(Boolean))].join(', ');
+      const yarnTypes=[...new Set(gRecs.map(r=>(r.count||'').trim()).filter(Boolean))].join(', ');
+      const atmlDisplay=atmlNo?('ATML-'+esc(atmlNo)):[...new Set(gRecs.map(r=>r.atml).filter(Boolean))].map(a=>'ATML-'+esc(a)).join(', ');
       const rowHtml=r=>`<tr>
           <td class="main"><div class="ldf-mainwrap">
             <div class="ldf-cname-h">Color Name/Pantone NO:</div>
@@ -1037,8 +1074,8 @@
           <div class="ft">Lab dip Submission Form</div>
         </div>
         <table class="ldf-info">
-          <tr><td class="lbl">Party:</td><td>Akij Textile</td><td class="lbl">Sub Date:</td><td><input type="text" value="${esc(subDate)}"></td></tr>
-          <tr><td class="lbl">Buyer</td><td><input type="text" value="${esc(buyer)}"></td><td class="lbl">ATML</td><td><input type="text" value="ATML-${esc(atmlNo)}"></td></tr>
+          <tr><td class="lbl">Party Name:</td><td>Akij Textile</td><td class="lbl">Sub Date:</td><td><input type="text" value="${esc(subDate)}"></td></tr>
+          <tr><td class="lbl">Buyer name</td><td><input type="text" value="${esc(buyer)}"></td><td class="lbl">ATML</td><td><input type="text" value="${atmlDisplay}"></td></tr>
           <tr><td class="lbl">Yarn</td><td><input type="text" value="${esc(yarnTypes)}" readonly></td><td class="lbl">Execution No:</td><td><input type="text" value=""></td></tr>
         </table>
         <table class="ldf-grid">
@@ -1048,6 +1085,75 @@
       </div>`;
     });
     return html;
+  }
+  /* ---------- Sweater1: same grid layout, different info-table labels (all blank/editable) ---------- */
+  function buildSweaterFormPages(records){
+    const groups=[];
+    for(let i=0;i<records.length;i+=4)groups.push(records.slice(i,i+4));
+    if(!groups.length)groups.push([]);
+    let html='';
+    groups.forEach(group=>{
+      const gRecs=group.filter(Boolean);
+      const subDate=gRecs.length?dt(gRecs[0].date):'';
+      const buyer=[...new Set(gRecs.map(r=>r.buyer).filter(Boolean))].join(', ');
+      const ycParts=gRecs.map(r=>splitYarnCount(r.count));
+      const countVals=[...new Set(ycParts.map(p=>p.num).filter(Boolean))].join(', ');
+      const compVals=[...new Set(ycParts.map(p=>p.comp).filter(Boolean))].join(', ');
+      const rowHtml=r=>`<tr>
+          <td class="main"><div class="ldf-mainwrap">
+            <div class="ldf-cname-h">Color Name/Pantone NO:</div>
+            <div class="ldf-cnamewrap">
+              <div class="ldf-cname">${r?esc(r.shade):'&nbsp;'}</div>
+              <div class="ldf-pantone"><input type="text" value="${r?esc(r.pantone||''):''}"></div>
+            </div>
+            <div class="ldf-sub"><div>Lab Dip No</div><div>Yarn Type</div></div>
+            <div class="ldf-vals"><div>${r?esc(r.lab):'&nbsp;'}</div><div>${r?esc(r.count):'&nbsp;'}</div></div>
+          </div></td>
+          <td class="opt"></td><td class="opt"></td><td class="opt"></td>
+        </tr>`;
+      let rowsHtml=group.map(r=>rowHtml(r)).join('');
+      for(let i=group.length;i<4;i++)rowsHtml+=rowHtml(null);
+      html+=`<div class="ldf-page">
+        <div class="ldf-head">
+          <div class="toprow">
+            <img class="logo" src="https://raw.githubusercontent.com/jamansiddiqi/lab/main/Logo.jpg" onerror="this.onerror=null;this.src='https://placehold.co/90x44/ffffff/0b2c7e?text=Akij';">
+            <div class="txtcol">
+              <div class="co">Akij Textile Mills Ltd</div>
+              <div class="addr">Golora, Manikgonj</div>
+            </div>
+          </div>
+          <div class="ft">Lab dip Submission Form</div>
+        </div>
+        <table class="ldf-info">
+          <tr><td class="lbl">Party Name:</td><td>Akij Textile</td><td class="lbl">Sub Date:</td><td><input type="text" value="${esc(subDate)}"></td></tr>
+          <tr><td class="lbl">Buyer name</td><td><input type="text" value="${esc(buyer)}"></td><td class="lbl">Yarn Composition</td><td><input type="text" value="${esc(compVals)}"></td></tr>
+          <tr><td class="lbl">Style</td><td><input type="text" value=""></td><td class="lbl">Count</td><td><input type="text" value="${esc(countVals)}"></td></tr>
+        </table>
+        <table class="ldf-grid">
+          <thead><tr><th class="main"><button type="button" class="ldf-navbtn" data-dir="-1" title="Previous">&laquo;</button>Labdip Option<button type="button" class="ldf-navbtn" data-dir="1" title="Next">&raquo;</button></th><th class="opt ldf-optcol" data-ci="0">A</th><th class="opt ldf-optcol" data-ci="1">B</th><th class="opt ldf-optcol" data-ci="2">C</th></tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>`;
+    });
+    return html;
+  }
+  const COL_LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const COL_GROUP_MAX=8; /* groups of 3: A-C(0) ... Y-Z(8, only 2 letters) */
+  const colGroupLetters=idx=>{const s=idx*3;return [0,1,2].map(i=>COL_LETTERS[s+i]||'');};
+  function wireSweaterColNav(){
+    let idx=0;
+    const apply=()=>{
+      const letters=colGroupLetters(idx);
+      $('fmtContent').querySelectorAll('.ldf-optcol').forEach(th=>{
+        th.textContent=letters[+th.dataset.ci]||'';
+      });
+    };
+    $('fmtContent').querySelectorAll('.ldf-navbtn').forEach(btn=>{
+      btn.onclick=()=>{
+        idx=Math.max(0,Math.min(COL_GROUP_MAX,idx+(+btn.dataset.dir)));
+        apply();
+      };
+    });
   }
   /* ---------- 10cm: single Labdip No swatch submission page ---------- */
   function buildTenCmPage(r){
@@ -1063,8 +1169,8 @@
           <div class="ft">Lab dip Submission Form</div>
         </div>
         <table class="tcm-info">
-          <tr><td class="lbl">Party:</td><td>${esc(r.buyer)}</td><td class="lbl">Date</td><td>${esc(dt(r.date))}</td></tr>
-          <tr><td class="lbl">Buyer</td><td>${esc(r.buyer)}</td><td class="lbl">Yarn Composition</td><td>${esc(r.count)}</td></tr>
+          <tr><td class="lbl">Party Name:</td><td>${esc(r.buyer)}</td><td class="lbl">Date</td><td>${esc(dt(r.date))}</td></tr>
+          <tr><td class="lbl">Buyer name</td><td>${esc(r.buyer)}</td><td class="lbl">Yarn Composition</td><td>${esc(r.count)}</td></tr>
           <tr><td class="lbl">Color Name/Pantone NO:</td><td>${esc(r.shade)}</td><td colspan="2">${esc(r.pantone||'')}</td></tr>
           <tr><td class="lbl">Lab Dip No</td><td colspan="3">${esc(r.lab)}</td></tr>
         </table>
@@ -1080,7 +1186,55 @@
         </table>
       </div>`;
   }
+  /* ---------- Envelope: 3 cut-ready shipping labels per A4 page ---------- */
+  function fmtEnvDate(d){
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return String(d.getDate()).padStart(2,'0')+'-'+months[d.getMonth()]+'-'+String(d.getFullYear()).slice(-2);
+  }
+  function buildEnvelopePage(r){
+    const today=fmtEnvDate(new Date());
+    const copy=(checked)=>`<div class="env-copy">
+        <div class="env-chk"><input type="checkbox" class="envChk" ${checked?'checked':''}><span>Print this</span></div>
+        <div class="env-mid">
+          <div class="env-from">
+            <input type="text" value="From,">
+            <input type="text" value="Md.Salauddin">
+            <input type="text" value="Manager Laboratory">
+            <input type="text" value="ATML (Yarn Dyeing Unit)">
+          </div>
+          <div class="env-to">
+            <div class="env-date-line">Date:<input type="text" value="${esc(today)}"></div>
+            <div class="to-row"><span class="totxt">To,</span><input type="text" class="to-name-inline" value="${esc(r?r.buyer:'')}"></div>
+            <div class="attnrow">Attn, Mr.<input type="text" value=""></div>
+            <div class="yarnrow">Yarn:<input type="text" value="${esc(r?r.count:'')}"></div>
+            <div class="yarnrow">No Of L/D<input type="text" value=""></div>
+          </div>
+        </div>
+        <div class="env-bottom">
+          <table>
+            <tr><td class="lbl" rowspan="3"><input type="text" value="1st drop"></td><td><input type="text" value="${esc(r?r.mkt:'')}"></td></tr>
+            <tr><td><input type="text" value="Sales @Marketing"></td></tr>
+            <tr><td><input type="text" value="Akij House, 198 Bir Uttam Mir Shawkat Sarak, Dhaka 1208"></td></tr>
+          </table>
+        </div>
+      </div>`;
+    return `<div class="env-page">
+        ${copy(true)}
+        ${copy(false)}
+        ${copy(false)}
+      </div>`;
+  }
+  $('btnEnvelope').onclick=()=>{
+    setActiveFmtBtn('btnEnvelope');
+    const r=sel();if(!r)return;
+    $('fmtContent').innerHTML=buildEnvelopePage(r);
+    $('fmtPrint').style.display='inline-block';
+  };
+  function setActiveFmtBtn(activeId){
+    ['btnAtmlCode','btn10cm','btnSweater1','btnEnvelope'].forEach(id=>{$(id).classList.toggle('sec',!!(activeId&&id!==activeId));});
+  }
   $('btn10cm').onclick=()=>{
+    setActiveFmtBtn('btn10cm');
     const input=prompt('Enter Labdip No (number only):');
     if(input===null)return;
     const d=digits(input);
@@ -1094,10 +1248,12 @@
   $('bFormat').onclick=()=>{
     $('fmtContent').innerHTML='';
     $('fmtPrint').style.display='none';
+    setActiveFmtBtn(null);
     $('fmtOv').classList.add('show');
   };
   $('fmtClose').onclick=()=>{$('fmtOv').classList.remove('show');};
-  function showLabdipChecklist(matches,atmlNo){
+  function showLabdipChecklist(matches,atmlNo,builderFn){
+    builderFn=builderFn||buildLabdipFormPages;
     $('fmtPrint').style.display='none';
     const rows=matches.map((r,i)=>`<label class="ldfchk-row">
         <input type="checkbox" class="ldfchk" data-idx="${i}" checked>
@@ -1105,8 +1261,9 @@
         <span class="ldfchk-shade">${esc(r.shade)}</span>
         <span class="ldfchk-count">${esc(r.count)}</span>
       </label>`).join('');
+    const headPrefix=atmlNo?('ATML-'+esc(atmlNo)+' - '):'';
     $('fmtContent').innerHTML=`<div class="ldfchk-wrap">
-        <div class="ldfchk-head">ATML-${esc(atmlNo)} - ${matches.length} Labdip No found. Select which to include in the report:</div>
+        <div class="ldfchk-head">${headPrefix}${matches.length} Labdip No found. Select which to include in the report:</div>
         <div class="ldfchk-toolbar">
           <button type="button" class="btn sm" id="ldfchkAll">Select All</button>
           <button type="button" class="btn sm sec" id="ldfchkNone">Clear All</button>
@@ -1120,11 +1277,13 @@
       const picked=[];
       $('fmtContent').querySelectorAll('.ldfchk').forEach(c=>{if(c.checked)picked.push(matches[+c.dataset.idx]);});
       if(!picked.length){toast('Please select at least one Labdip No');return;}
-      $('fmtContent').innerHTML=buildLabdipFormPages(picked,atmlNo);
+      $('fmtContent').innerHTML=builderFn(picked,atmlNo);
       $('fmtPrint').style.display='inline-block';
+      if(builderFn===buildSweaterFormPages)wireSweaterColNav();
     };
   }
   $('btnAtmlCode').onclick=()=>{
+    setActiveFmtBtn('btnAtmlCode');
     const input=prompt('Enter ATML No (number only):');
     if(input===null)return;
     const d=digits(input);
@@ -1134,11 +1293,25 @@
     matches.sort((a,b)=>new Date(a.at||0)-new Date(b.at||0));
     showLabdipChecklist(matches,d);
   };
+  $('btnSweater1').onclick=()=>{
+    setActiveFmtBtn('btnSweater1');
+    if(!(qText.trim()||advActive())){toast('Please filter first all value.');return;}
+    const picked=filtered().map(x=>x.r);
+    if(!picked.length){toast('No matching records found');return;}
+    picked.sort((a,b)=>new Date(a.at||0)-new Date(b.at||0));
+    showLabdipChecklist(picked,'',buildSweaterFormPages);
+  };
   $('fmtPrint').onclick=()=>{
     $('fmtContent').querySelectorAll('input').forEach(inp=>inp.setAttribute('value',inp.value));
+    const hiddenCopies=[];
+    $('fmtContent').querySelectorAll('.env-copy').forEach(c=>{
+      const chk=c.querySelector('.envChk');
+      if(chk&&!chk.checked){c.style.display='none';hiddenCopies.push(c);}
+    });
     $('printArea').innerHTML=$('fmtContent').innerHTML;
     $('pageStyle').textContent='@page{size:A4 portrait;margin:6mm}';
     window.print();
+    hiddenCopies.forEach(c=>{c.style.display='';});
   };
 
   /* ---------- Dyes Upload (existing dyes keep their saved price) ---------- */
