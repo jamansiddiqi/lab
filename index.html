@@ -88,6 +88,17 @@
   .ldf-title{font-weight:700;text-decoration:underline;font-size:17px;margin:0 0 10px;text-align:center}
   .fmtbtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
   #fmtContent{flex:1;min-height:0;overflow:auto;border:1px solid #e3e8ef;border-radius:6px;background:#f3f4f6;padding:6px}
+  .ldfchk-wrap{padding:6px}
+  .ldfchk-head{font-weight:600;margin-bottom:8px;font-size:13px;color:var(--navy)}
+  .ldfchk-toolbar{display:flex;gap:8px;margin-bottom:8px}
+  .ldfchk-list{display:flex;flex-direction:column;gap:2px;max-height:48vh;overflow:auto;border:1px solid #e3e8ef;border-radius:6px;background:#fff;padding:6px}
+  .ldfchk-row{display:flex;align-items:center;gap:0;padding:5px 8px;border-bottom:1px solid #f0f2f5;font-size:12px;cursor:pointer}
+  .ldfchk-row:last-child{border-bottom:none}
+  .ldfchk-row:hover{background:#f6f8fb}
+  .ldfchk-row input[type="checkbox"]{flex:0 0 24px;width:15px;height:15px;margin:0}
+  .ldfchk-lab,.ldfchk-shade,.ldfchk-count{flex:1;text-align:center;padding:0 4px}
+  .ldfchk-lab{font-weight:700;color:var(--navy)}
+  .ldfchk-count{color:#5b6b7e;font-size:11px}
   .ldf-page{min-height:285mm;width:210mm;max-width:100%;margin:0 auto 14px;background:#fff;padding:8px 10px 10px;box-shadow:0 1px 4px rgba(0,0,0,.15);box-sizing:border-box;font-family:Arial,sans-serif;color:#000;display:flex;flex-direction:column}
   .ldf-head{display:flex;flex-direction:column;align-items:center;margin-bottom:6px}
   .ldf-head .toprow{display:flex;align-items:center;justify-content:center;gap:8px}
@@ -697,7 +708,7 @@
   /* ---------- View record ---------- */
   $('bView').onclick=()=>{
     const r=sel();if(!r)return;
-    const rows=[['Date',r.date],['Marketing Person',r.mkt],['Buyer',r.buyer],['Shade Name',r.shade],['Count',r.count],['Pretreatment',r.pre],['Labdip No',r.lab],['Remarks',r.rem],['Locked',r.locked?'Yes':'No'],['Entry By',r.by],['Created at',fmtFull(r.at)]];
+    const rows=[['Type',r.type],['ATML No',r.atml?'ATML-'+r.atml:''],['Date',r.date],['Marketing Person',r.mkt],['Buyer',r.buyer],['Shade Name',r.shade],['Pantone No',r.pantone],['Count',r.count],['Pretreatment',r.pre],['Labdip No',r.lab],['Remarks',r.rem],['Locked',r.locked?'Yes':'No'],['Entry By',r.by],['Created at',fmtFull(r.at)]];
     let h=rows.map(x=>`<div class="viewrow"><b>${x[0]}</b><span>${esc(x[1])}</span></div>`).join('');
     h+=`<div class="dyebox" style="margin-top:12px"><table class="dyetbl"><thead><tr><th>Dyes Name</th><th>Shade %</th><th>Price</th><th>Cost</th></tr></thead><tbody>`+
       (r.dyes||[]).map(d=>`<tr><td>${esc(d.name)}</td><td>${esc(pctFmt(d.pct))}</td><td>${esc(p2(d.price))}</td><td>${(num(d.price)*num(d.pct)/100).toFixed(3)} $</td></tr>`).join('')+
@@ -1033,6 +1044,33 @@
     $('fmtOv').classList.add('show');
   };
   $('fmtClose').onclick=()=>{$('fmtOv').classList.remove('show');};
+  function showLabdipChecklist(matches,atmlNo){
+    $('fmtPrint').style.display='none';
+    const rows=matches.map((r,i)=>`<label class="ldfchk-row">
+        <input type="checkbox" class="ldfchk" data-idx="${i}" checked>
+        <span class="ldfchk-lab">${r.lab?esc(r.lab):'(no labdip no)'}</span>
+        <span class="ldfchk-shade">${esc(r.shade)}</span>
+        <span class="ldfchk-count">${esc(r.count)}</span>
+      </label>`).join('');
+    $('fmtContent').innerHTML=`<div class="ldfchk-wrap">
+        <div class="ldfchk-head">ATML-${esc(atmlNo)} - ${matches.length} Labdip No found. Select which to include in the report:</div>
+        <div class="ldfchk-toolbar">
+          <button type="button" class="btn sm" id="ldfchkAll">Select All</button>
+          <button type="button" class="btn sm sec" id="ldfchkNone">Clear All</button>
+        </div>
+        <div class="ldfchk-list">${rows}</div>
+        <div class="actions"><button type="button" class="btn" id="ldfchkGo">Generate Report</button></div>
+      </div>`;
+    $('ldfchkAll').onclick=()=>{$('fmtContent').querySelectorAll('.ldfchk').forEach(c=>c.checked=true);};
+    $('ldfchkNone').onclick=()=>{$('fmtContent').querySelectorAll('.ldfchk').forEach(c=>c.checked=false);};
+    $('ldfchkGo').onclick=()=>{
+      const picked=[];
+      $('fmtContent').querySelectorAll('.ldfchk').forEach(c=>{if(c.checked)picked.push(matches[+c.dataset.idx]);});
+      if(!picked.length){toast('Please select at least one Labdip No');return;}
+      $('fmtContent').innerHTML=buildLabdipFormPages(picked,atmlNo);
+      $('fmtPrint').style.display='inline-block';
+    };
+  }
   $('btnAtmlCode').onclick=()=>{
     const input=prompt('Enter ATML No (number only):');
     if(input===null)return;
@@ -1041,8 +1079,7 @@
     const matches=db.records.filter(r=>(r.atml||'')===d);
     if(!matches.length){toast('No record found for ATML-'+d);return;}
     matches.sort((a,b)=>new Date(a.at||0)-new Date(b.at||0));
-    $('fmtContent').innerHTML=buildLabdipFormPages(matches,d);
-    $('fmtPrint').style.display='inline-block';
+    showLabdipChecklist(matches,d);
   };
   $('fmtPrint').onclick=()=>{
     $('fmtContent').querySelectorAll('input').forEach(inp=>inp.setAttribute('value',inp.value));
@@ -1123,7 +1160,9 @@
     "Dyed Chemical এর দাম নিয়মিত আপডেট করূন।",
     "সেভ করা ফাইলটি নিয়মিত ব্যকআপ রাখুন।",
     "Cost কমানোর চেষ্টা করূন।",
-    "অতিরিক্ত Cost কতৃপক্ষকে অবগত করূন।"
+    "অতিরিক্ত Cost কতৃপক্ষকে অবগত করূন।",
+    "Akij Textile Mills Limited",
+    "We Believe in Continuous Development."
   ];
   let idx=0;
   const msgEl=document.getElementById('footer-message');
