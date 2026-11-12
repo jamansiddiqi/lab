@@ -43,6 +43,7 @@
   main{flex:1;min-height:0;padding:0 20px 0;display:flex;flex-direction:column}
   .card{background:#fff;border:1px solid var(--line);border-radius:6px;overflow:auto;flex:1;min-height:0}
   table{border-collapse:collapse;width:100%;font-size:12px}
+  td.small70{font-size:8.4px}
   th{background:var(--navy);color:#fff;text-align:left;padding:5px 7px;position:sticky;top:0;white-space:nowrap;border:1px solid var(--navy)}
   td{padding:3px 7px;border:1px solid var(--line)}
   tr.sel td{background:#dcecfb}
@@ -81,6 +82,49 @@
   #advForm input,#advForm select{padding:4px 7px;font-size:12px}
   #advForm .grid2{gap:0 8px}
   #advForm .actions{margin-top:8px}
+  .toolbar button#bFormat{background:#7c3aed;color:#fff;border-color:#7c3aed}
+  .toolbar button#bFormat:hover{background:#6525d6;border-color:#6525d6}
+  .fmtmodal{width:min(900px,96vw);max-height:92vh;display:flex;flex-direction:column}
+  .ldf-title{font-weight:700;text-decoration:underline;font-size:17px;margin:0 0 10px;text-align:center}
+  .fmtbtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  #fmtContent{flex:1;min-height:0;overflow:auto;border:1px solid #e3e8ef;border-radius:6px;background:#f3f4f6;padding:6px}
+  .ldf-page{min-height:285mm;width:210mm;max-width:100%;margin:0 auto 14px;background:#fff;padding:8px 10px 10px;box-shadow:0 1px 4px rgba(0,0,0,.15);box-sizing:border-box;font-family:Arial,sans-serif;color:#000;display:flex;flex-direction:column}
+  .ldf-head{display:flex;flex-direction:column;align-items:center;margin-bottom:6px}
+  .ldf-head .toprow{display:flex;align-items:center;justify-content:center;gap:8px}
+  .ldf-head .logo{height:44px;width:auto;object-fit:contain;flex-shrink:0}
+  .ldf-head .txtcol{display:flex;flex-direction:column;align-items:center;line-height:1.2}
+  .ldf-head .co{font-size:19px;font-weight:700}
+  .ldf-head .addr{font-size:11px;color:#333}
+  .ldf-head .ft{font-size:13px;font-weight:600;margin-top:4px;text-decoration:underline}
+  .ldf-info{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:6px}
+  .ldf-info td{border:1px solid #000;padding:1px 6px;text-align:center}
+  .ldf-info td.lbl{background:#f3f4f6;font-weight:600;width:18%}
+  .ldf-info input{width:100%;border:none;outline:none;text-align:center;font-family:inherit;font-size:11px;background:transparent}
+  .ldf-grid{width:100%;border-collapse:collapse;display:flex;flex-direction:column;flex:1;border-top:1px solid #000;border-left:1px solid #000}
+  .ldf-grid thead{display:block;width:100%}
+  .ldf-grid thead tr{display:flex;width:100%}
+  .ldf-grid th{border-top:none;border-left:none;border-right:1px solid #000;border-bottom:1px solid #000;background:#f3f4f6;font-weight:700;font-size:14px;color:#000;padding:5px;text-align:center}
+  .ldf-grid tbody{display:flex;flex-direction:column;width:100%;flex:1}
+  .ldf-grid tbody tr{display:flex;width:100%;flex:1}
+  .ldf-grid td{border-top:none;border-left:none;border-right:1px solid #000;border-bottom:1px solid #000;vertical-align:top;padding:0}
+  .ldf-grid .main{width:37%;display:flex;flex-direction:column}
+  .ldf-grid .opt{width:21%}
+  .ldf-mainwrap{display:flex;flex-direction:column;width:100%;height:100%}
+  .ldf-cname-h{border-bottom:1px solid #000;background:#f3f4f6;padding:4px;text-align:center;font-size:10px;color:#000;font-weight:700}
+  .ldf-cnamewrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px}
+  .ldf-cname{text-align:center;font-size:14px;font-weight:700}
+  .ldf-pantone{text-align:center;font-size:10px;margin-top:2px;width:100%}
+  .ldf-pantone input{width:100%;border:none;outline:none;text-align:center;font-family:inherit;font-size:10px;background:transparent;color:#000}
+  .ldf-sub{display:flex;border-top:1px solid #000;border-bottom:1px solid #000}
+  .ldf-sub>div{flex:1;padding:4px;text-align:center;font-size:10px;font-weight:600;background:#f3f4f6}
+  .ldf-sub>div:first-child{border-right:1px solid #000;flex:0 0 35%}
+  .ldf-vals{display:flex}
+  .ldf-vals>div{flex:1;padding:4px;text-align:center;font-size:11px;font-weight:600}
+  .ldf-vals>div:first-child{border-right:1px solid #000;flex:0 0 35%;background:#fffb8f}
+  @media print{
+    .ldf-page{box-shadow:none;margin:0 auto}
+    .ldf-page:not(:last-of-type){page-break-after:always}
+  }
   .modal.xl{width:min(860px,96vw)}
   .modal h2{margin:0 0 4px;color:var(--navy);font-size:20px}
   .modal p{margin:0 0 14px;color:#5b6b7e;font-size:13px}
@@ -199,6 +243,7 @@
   <button id="bMail" title="Email the selected record's cost details via Outlook">Mail</button>
   <button id="bMultiMail" title="Email all currently filtered records' cost details + a PDF report">Multiple Mail</button>
   <button id="bWhatsapp" title="Send the selected record's cost details via WhatsApp (cost must be above 0.2$)">WhatsApp</button>
+  <button id="bFormat" title="Print a Lab Dip Submission Form by ATML No">Format</button>
   <input type="file" id="dyeFile" accept=".xlsx,.xls,.csv" hidden>
   <div class="status"><span><span class="dot" id="dbDot"></span><span id="dbTxt">Database not connected</span></span><button id="bConn" title="Connect or reconnect to the JSON database file">Connect</div>
 </div>
@@ -207,7 +252,7 @@
   <div class="fbar" id="fbar"><span id="fInfo"></span><button type="button" class="btn sm sec" id="fClear" title="Clear search &amp; filters, show latest records">Clear filter</div>
   <div class="card">
     <table>
-      <thead><tr><th>#</th><th>Type</th><th>ATML No</th><th>Date</th><th>Marketing Person</th><th>Buyer</th><th>Shade Name</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th>Shade%</th><th>Cost/Kg ($)</th><th>Remarks</th><th>Lock</th><th>Entry By</th></tr></thead>
+      <thead><tr><th>#</th><th>Type</th><th>ATML No</th><th>Date</th><th>Marketing Person</th><th>Buyer</th><th>Shade Name</th><th>Pantone Number</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th>Shade%</th><th>Cost/Kg ($)</th><th>Remarks</th><th>Lock</th><th>Entry By</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
@@ -257,6 +302,7 @@
       <div><label>Marketing Person</label><input id="fMkt" list="dlMkt" autocomplete="off"></div>
       <div><label>Buyer</label><input id="fBuyer" list="dlBuyer" autocomplete="off"></div>
       <div><label>Shade Name</label><input id="fShade" required></div>
+      <div><label>Pantone Number</label><input id="fPantone"></div>
       <div><label>Yarn Count &amp; Composition</label><input id="fCount" list="dlCount" autocomplete="off"></div>
       <div><label>Pretreatment Type</label>
         <select id="fPre"><option>Bleach</option><option>Scouring</option><option>Grey</option><option>Others</option></select></div>
@@ -324,6 +370,7 @@
       <div><label>Entry By</label><input id="aBy" list="dlBy" autocomplete="off"></div>
       <div><label>Buyer</label><input id="aBuyer" list="dlBuyer" autocomplete="off"></div>
       <div><label>Shade Name</label><input id="aShade"></div>
+      <div><label>Pantone Number</label><input id="aPantone"></div>
       <div><label>Labdip No</label><input id="aLab" inputmode="numeric"></div>
       <div><label>Yarn Count &amp; Composition</label><input id="aCount" list="dlCount" autocomplete="off"></div>
       <div></div>
@@ -352,6 +399,20 @@
       <button type="submit" class="btn" title="Save this Marketing Person for the buyer">OK</button>
     </div>
   </form>
+</div>
+
+<div class="overlay" id="fmtOv">
+  <div class="modal fmtmodal">
+    <h2 class="ldf-title">Print Your Lab Dip Submission.</h2>
+    <div class="fmtbtns">
+      <button type="button" class="btn" id="btnAtmlCode">ATML Code</button>
+    </div>
+    <div id="fmtContent"></div>
+    <div class="actions">
+      <button type="button" class="btn sec" id="fmtClose" title="Close this window">Close</button>
+      <button type="button" class="btn" id="fmtPrint" style="display:none" title="Print the generated form">Print This</button>
+    </div>
+  </div>
 </div>
 
 <style id="pageStyle"></style>
@@ -493,6 +554,7 @@
       if(has(adv.mkt)&&!low(r.mkt).includes(low(adv.mkt).trim()))continue;
       if(has(adv.buyer)&&!low(r.buyer).includes(low(adv.buyer).trim()))continue;
       if(has(adv.shade)&&!low(r.shade).includes(low(adv.shade).trim()))continue;
+      if(has(adv.pantone)&&!low(r.pantone).includes(low(adv.pantone).trim()))continue;
       if(has(adv.count)&&!low(r.count).includes(low(adv.count).trim()))continue;
       if(has(adv.lab)&&!low(r.lab).includes(low(adv.lab).trim()))continue;
       if(has(adv.type)&&r.type!==adv.type)continue;
@@ -518,6 +580,7 @@
     if(has(adv.mkt))p.push('Marketing Person: '+adv.mkt);
     if(has(adv.buyer))p.push('Buyer: '+adv.buyer);
     if(has(adv.shade))p.push('Shade: '+adv.shade);
+    if(has(adv.pantone))p.push('Pantone: '+adv.pantone);
     if(has(adv.count))p.push('Count: '+adv.count);
     if(has(adv.lab))p.push('Labdip No: '+adv.lab);
     if(has(adv.pmin))p.push('Shade% min: '+adv.pmin+'%');
@@ -536,7 +599,7 @@
       const r=x.r,i=x.n-1;
       const tr=document.createElement('tr');if(r.id===selId)tr.className='sel';
       const _c=costOf(r),_cTxt=`${_c.toFixed(3)} $`,_cCell=_c>=0.3?`<span class="costhot" title="Don't Dye, talk with Higher Management.">${_cTxt}</span>`:_cTxt;
-      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.type)}</td><td>${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td>${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
+      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.type)}</td><td class="small70">${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td class="small70">${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.pantone)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
       tr.addEventListener('click',()=>{selId=r.id;render();});
       tb.appendChild(tr);
     }
@@ -595,7 +658,7 @@
     $('recTitle').textContent=r?'Edit Recipe':'Add Your Recipe';
     $('fType').value=r?(r.type||''):'';$('fAtml').value=r?(r.atml||''):'';
     $('fDate').value=r?r.date:new Date().toISOString().slice(0,10);
-    $('fMkt').value=r?r.mkt:'';$('fBuyer').value=r?r.buyer:'';$('fShade').value=r?r.shade:'';$('fCount').value=r?r.count:'';
+    $('fMkt').value=r?r.mkt:'';$('fBuyer').value=r?r.buyer:'';$('fShade').value=r?r.shade:'';$('fPantone').value=r?(r.pantone||''):'';$('fCount').value=r?r.count:'';
     $('fPre').value=r?r.pre:'Bleach';$('fLab').value=r?r.lab:'';$('fRem').value=r?r.rem:'';
     formDyes=r?JSON.parse(JSON.stringify(r.dyes||[])):[];
     renderDyeRows();$('recOv').classList.add('show');
@@ -605,7 +668,7 @@
   $('recCancel').onclick=()=>$('recOv').classList.remove('show');
   $('recForm').addEventListener('submit',async e=>{
     e.preventDefault();
-    const data={type:$('fType').value,atml:digits($('fAtml').value),date:$('fDate').value,mkt:capFirst($('fMkt').value),buyer:capFirst($('fBuyer').value),shade:capFirst($('fShade').value),count:$('fCount').value.trim(),pre:$('fPre').value,lab:digits($('fLab').value),rem:$('fRem').value.trim(),dyes:formDyes.map(d=>({name:d.name,pct:d.pct,price:d.price}))};
+    const data={type:$('fType').value,atml:digits($('fAtml').value),date:$('fDate').value,mkt:capFirst($('fMkt').value),buyer:capFirst($('fBuyer').value),shade:capFirst($('fShade').value),pantone:$('fPantone').value.trim(),count:$('fCount').value.trim(),pre:$('fPre').value,lab:digits($('fLab').value),rem:$('fRem').value.trim(),dyes:formDyes.map(d=>({name:d.name,pct:d.pct,price:d.price}))};
     if(editId){Object.assign(db.records.find(x=>x.id===editId),data,{modBy:user,modAt:new Date().toISOString()});}
     else{const id='r'+Date.now();db.records.push({id,...data,locked:false,by:user,at:new Date().toISOString()});selId=id;}
     $('recOv').classList.remove('show');render();
@@ -748,17 +811,11 @@
   };
 
   /* ---------- Search / Advance search ---------- */
-  $('fBuyer').addEventListener('change',()=>{
-    if(!$('fMkt').value.trim()){
-      const m=lastMktForBuyer($('fBuyer').value,editId);
-      if(m)$('fMkt').value=m;
-    }
-  });
   $('fLab').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('fAtml').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('aLab').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('qSearch').addEventListener('input',e=>{qText=e.target.value;render();});
-  const AF={aFrom:'from',aTo:'to',aBy:'by',aMkt:'mkt',aBuyer:'buyer',aShade:'shade',aCount:'count',aLab:'lab',aPmin:'pmin',aPmax:'pmax',aCmin:'cmin',aCmax:'cmax',aType:'type',aAtml:'atml'};
+  const AF={aFrom:'from',aTo:'to',aBy:'by',aMkt:'mkt',aBuyer:'buyer',aShade:'shade',aPantone:'pantone',aCount:'count',aLab:'lab',aPmin:'pmin',aPmax:'pmax',aCmin:'cmin',aCmax:'cmax',aType:'type',aAtml:'atml'};
   $('bAdv').onclick=()=>{for(const k in AF)$(k).value=adv[AF[k]]||'';$('advOv').classList.add('show');};
   $('advClose').onclick=()=>$('advOv').classList.remove('show');
   $('advClear').onclick=()=>{adv={};for(const k in AF)$(k).value='';render();};
@@ -922,6 +979,78 @@
     window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
   };
 
+  /* ---------- Format: Lab Dip Submission Form by ATML No ---------- */
+  function buildLabdipFormPages(records,atmlNo){
+    const groups=[];
+    for(let i=0;i<records.length;i+=4)groups.push(records.slice(i,i+4));
+    if(!groups.length)groups.push([]);
+    const subDate=records.length?dt(records[0].date):'';
+    const buyer=records.length?records[0].buyer:'';
+    const yarnTypes=[...new Set(records.map(r=>(r.count||'').trim()).filter(Boolean))].join(', ');
+    let html='';
+    groups.forEach(group=>{
+      const rowHtml=r=>`<tr>
+          <td class="main"><div class="ldf-mainwrap">
+            <div class="ldf-cname-h">Color Name/Pantone NO:</div>
+            <div class="ldf-cnamewrap">
+              <div class="ldf-cname">${r?esc(r.shade):'&nbsp;'}</div>
+              <div class="ldf-pantone"><input type="text" value="${r?esc(r.pantone||''):''}"></div>
+            </div>
+            <div class="ldf-sub"><div>Lab Dip No</div><div>Yarn Type</div></div>
+            <div class="ldf-vals"><div>${r?esc(r.lab):'&nbsp;'}</div><div>${r?esc(r.count):'&nbsp;'}</div></div>
+          </div></td>
+          <td class="opt"></td><td class="opt"></td><td class="opt"></td>
+        </tr>`;
+      let rowsHtml=group.map(r=>rowHtml(r)).join('');
+      for(let i=group.length;i<4;i++)rowsHtml+=rowHtml(null);
+      html+=`<div class="ldf-page">
+        <div class="ldf-head">
+          <div class="toprow">
+            <img class="logo" src="https://raw.githubusercontent.com/jamansiddiqi/lab/main/Logo.jpg" onerror="this.onerror=null;this.src='https://placehold.co/90x44/ffffff/0b2c7e?text=Akij';">
+            <div class="txtcol">
+              <div class="co">Akij Textile Mills Ltd</div>
+              <div class="addr">Golora, Manikgonj</div>
+            </div>
+          </div>
+          <div class="ft">Lab dip Submission Form</div>
+        </div>
+        <table class="ldf-info">
+          <tr><td class="lbl">Party:</td><td>Akij Textile</td><td class="lbl">Sub Date:</td><td><input type="text" value="${esc(subDate)}"></td></tr>
+          <tr><td class="lbl">Buyer</td><td><input type="text" value="${esc(buyer)}"></td><td class="lbl">ATML</td><td><input type="text" value="ATML-${esc(atmlNo)}"></td></tr>
+          <tr><td class="lbl">Yarn</td><td><input type="text" value="${esc(yarnTypes)}" readonly></td><td class="lbl">Execution No:</td><td><input type="text" value=""></td></tr>
+        </table>
+        <table class="ldf-grid">
+          <thead><tr><th class="main">Labdip Option</th><th class="opt">A</th><th class="opt">B</th><th class="opt">C</th></tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>`;
+    });
+    return html;
+  }
+  $('bFormat').onclick=()=>{
+    $('fmtContent').innerHTML='';
+    $('fmtPrint').style.display='none';
+    $('fmtOv').classList.add('show');
+  };
+  $('fmtClose').onclick=()=>{$('fmtOv').classList.remove('show');};
+  $('btnAtmlCode').onclick=()=>{
+    const input=prompt('Enter ATML No (number only):');
+    if(input===null)return;
+    const d=digits(input);
+    if(!d){toast('Please enter a valid ATML No');return;}
+    const matches=db.records.filter(r=>(r.atml||'')===d);
+    if(!matches.length){toast('No record found for ATML-'+d);return;}
+    matches.sort((a,b)=>new Date(a.at||0)-new Date(b.at||0));
+    $('fmtContent').innerHTML=buildLabdipFormPages(matches,d);
+    $('fmtPrint').style.display='inline-block';
+  };
+  $('fmtPrint').onclick=()=>{
+    $('fmtContent').querySelectorAll('input').forEach(inp=>inp.setAttribute('value',inp.value));
+    $('printArea').innerHTML=$('fmtContent').innerHTML;
+    $('pageStyle').textContent='@page{size:A4 portrait;margin:6mm}';
+    window.print();
+  };
+
   /* ---------- Dyes Upload (existing dyes keep their saved price) ---------- */
   $('bDyeUp').onclick=()=>$('dyeFile').click();
   $('dyeFile').addEventListener('change',async e=>{
@@ -994,9 +1123,7 @@
     "Dyed Chemical এর দাম নিয়মিত আপডেট করূন।",
     "সেভ করা ফাইলটি নিয়মিত ব্যকআপ রাখুন।",
     "Cost কমানোর চেষ্টা করূন।",
-    "অতিরিক্ত Cost কতৃপক্ষকে অবগত করূন।",
-    "Akij Textile Mills Limited",
-    "We Believe in Continuous Development"
+    "অতিরিক্ত Cost কতৃপক্ষকে অবগত করূন।"
   ];
   let idx=0;
   const msgEl=document.getElementById('footer-message');
