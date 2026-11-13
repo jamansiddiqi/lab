@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>YD-LAB-Costing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Carlito:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -167,11 +170,83 @@
   .env-bottom td.lbl{font-weight:700;width:25%;vertical-align:middle;text-align:center}
   .env-bottom input{width:100%;border:none;outline:none;font-weight:600;font-size:12px;background:transparent;color:#000}
   .env-bottom td.lbl input{font-weight:700;text-align:center;font-size:36px}
+  .pvh-page{--pvh-border-dark:#000;--pvh-border-muted:#595959;--pvh-banner-blue:#C5D9F1;--pvh-highlight-yellow:#FFFF00;--pvh-alert-red:#FF0000;--pvh-muted-gray:#7F7F7F;width:210mm;min-height:285mm;max-width:100%;margin:0 auto 14px;background:#fff;padding:3mm 3mm 6mm 3mm;box-shadow:0 1px 4px rgba(0,0,0,.15);box-sizing:border-box;font-family:'Carlito','Calibri','Inter',Arial,sans-serif;color:#000;display:flex;flex-direction:column}
+  .pvh-page *{box-sizing:border-box}
+  .pvh-header-top{width:calc(100% + 6mm);margin:0 -3mm;box-sizing:border-box;border:1px solid var(--pvh-border-dark);border-bottom:none;display:flex;justify-content:space-between;align-items:flex-end;padding:1px 4px 3px 4px;min-height:52px}
+  .pvh-brand-cluster{display:flex;align-items:center;gap:10px;padding-bottom:1px}
+  .pvh-logo-img{height:44px;width:auto;object-fit:contain}
+  .pvh-header-meta{display:flex;align-items:baseline;gap:30px;padding-right:10px;padding-bottom:1px;font-size:8.5px;font-weight:700;flex-wrap:wrap;justify-content:flex-end}
+  .pvh-deadline-label{color:var(--pvh-alert-red);text-transform:uppercase;letter-spacing:.1px}
+  .pvh-deadline-label[contenteditable]{outline:none;min-width:40px;display:inline-block}
+  .pvh-submit-date-group{display:inline-flex;align-items:baseline;gap:8px}
+  .pvh-submit-label{color:var(--pvh-alert-red);text-transform:uppercase}
+  .pvh-submit-value{color:#000;font-weight:700;outline:none;min-width:50px;display:inline-block}
+  .pvh-title-banner{width:calc(100% + 6mm);margin:0 -3mm;background:var(--pvh-banner-blue);border:1px solid var(--pvh-border-dark);text-align:center;padding:4px 0;font-size:15.5px;font-weight:700;letter-spacing:.2px;color:#000}
+  .pvh-form-fields-section{width:calc(100% + 6mm);margin:6px -3mm 0 -3mm;border:1px solid var(--pvh-border-dark);padding:10px 8px 4px 8px;display:grid;grid-template-columns:1fr 1fr;column-gap:22px}
+  .pvh-form-col{display:flex;flex-direction:column}
+  .pvh-field-row{display:grid;align-items:end;min-height:21px;margin-bottom:2px}
+  .pvh-form-col-left .pvh-field-row{grid-template-columns:148px 1fr;column-gap:4px}
+  .pvh-form-col-right .pvh-field-row{grid-template-columns:168px 1fr;column-gap:4px}
+  .pvh-field-label{text-align:right;font-size:9.5px;font-weight:700;color:#000;padding-bottom:2px;white-space:nowrap}
+  .pvh-field-value{border-bottom:1px solid var(--pvh-border-muted);font-size:11px;font-weight:700;color:#000;padding:0 2px 2px 2px;min-height:16px;line-height:1.15;outline:none}
+  .pvh-field-value.center{text-align:center}
+  .pvh-field-value.muted{color:var(--pvh-muted-gray);font-weight:700}
+  .pvh-light-source-wrapper{margin-top:8px;margin-bottom:1px;display:grid;grid-template-columns:148px 1fr;column-gap:4px}
+  .pvh-light-labels-col{display:flex;flex-direction:column;justify-content:flex-end}
+  .pvh-light-label-spacer{height:28px}
+  .pvh-light-label-cell{height:18px;display:flex;align-items:flex-end;justify-content:flex-end;font-size:9px;font-weight:700;padding-bottom:2px;white-space:nowrap}
+  .pvh-light-table{width:100%;border-collapse:collapse;table-layout:fixed}
+  .pvh-light-table td{border:1px solid var(--pvh-border-muted);text-align:center;vertical-align:middle;font-size:9px;font-weight:700;color:#000;padding:2px 4px;outline:none}
+  .pvh-light-table tr.pvh-region-row td{height:28px;line-height:1.2}
+  .pvh-light-table tr.pvh-source-row td{height:18px}
+  .pvh-light-table col.pvh-col-region{width:52%}
+  .pvh-light-table col.pvh-col-illuminant{width:48%}
+  .pvh-fastness-row{display:grid;grid-template-columns:168px 1fr;column-gap:4px;align-items:center;margin-top:2px}
+  .pvh-fastness-box{background:var(--pvh-highlight-yellow);color:var(--pvh-alert-red);font-size:8.6px;font-weight:700;line-height:1.22;padding:2px 4px;text-transform:uppercase;outline:none}
+  .pvh-fsrr-section{margin-top:6px;display:flex;flex-direction:column;gap:4px}
+  .pvh-fsrr-top-row{display:grid;grid-template-columns:168px 1fr;column-gap:4px;align-items:center}
+  .pvh-fsrr-single-row{display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .pvh-fsrr-controls{display:flex;align-items:center;gap:2px;flex-shrink:0}
+  .pvh-fsrr-option-text{font-size:8px;font-weight:400;color:#000;display:inline-block}
+  .pvh-checkbox-rect{display:inline-block;width:26px;height:15px;border:1px solid var(--pvh-border-muted);background:#fff}
+  .pvh-fsrr-bottom-row{display:flex;align-items:center;justify-content:space-between}
+  .pvh-fsrr-note{color:var(--pvh-alert-red);font-size:7px;font-style:italic;font-weight:400;white-space:nowrap}
+  .pvh-fsrr-no-group{display:flex;align-items:center;gap:8px}
+  .pvh-swatch-grid{width:calc(100% + 6mm);margin:8px -3mm 0 -3mm;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--pvh-border-dark);border-left:1px solid var(--pvh-border-dark);flex:1}
+  .pvh-swatch-cell{border-right:1px solid var(--pvh-border-dark);border-bottom:1px solid var(--pvh-border-dark);padding:0;display:flex;flex-direction:column}
+  .pvh-swatch-header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;font-size:9.8px;font-weight:700;color:#000;border-bottom:1px solid var(--pvh-border-dark);padding:3px 4px}
+  .pvh-swatch-box{flex:1}
+  .pvh-swatch-option-title{justify-self:start}
+  .pvh-swatch-dip-top{justify-self:center;display:flex;align-items:center;gap:4px}
+  .pvh-swatch-dip-top input{border:none;border-bottom:1px solid #999;outline:none;font-weight:700;font-size:9.8px;background:transparent;color:#000;width:90px}
+  .pvh-swatch-footer{display:flex;flex-direction:column;gap:0;font-size:8.6px;font-weight:400;color:#000;line-height:1.15;padding:3px 4px 4px 4px}
+  .pvh-swatch-footer>div{margin:0}
+  .pvh-swatch-footer input{border:none;outline:none;font-weight:400;font-size:8.6px;background:transparent;color:#000;width:100px;height:auto;line-height:1.15;padding:0;margin:0 0 0 3px;vertical-align:baseline}
+  .pvh-swatch-footer>div{line-height:1.15;display:flex;align-items:baseline}
+  .pvh-doc-footer{padding:3px 2px 0 3px;display:flex;flex-direction:column}
+  .pvh-confidential-text{font-size:8.5px;font-weight:400;color:#000;margin-bottom:2px}
+  .pvh-footer-grid{display:grid;grid-template-columns:1.05fr .95fr;column-gap:24px;align-items:start}
+  .pvh-footer-left{display:flex;flex-direction:column}
+  .pvh-natific-row{display:flex;align-items:baseline;justify-content:flex-end;gap:4px;margin-bottom:6px}
+  .pvh-footer-label{font-size:9.8px;font-weight:700;color:#000;white-space:nowrap}
+  .pvh-natific-value{width:162px;border-bottom:1px solid var(--pvh-border-muted);text-align:center;font-size:8.8px;font-weight:700;padding-bottom:1px;outline:none}
+  .pvh-outcome-block{display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-right:20px}
+  .pvh-outcome-line{display:flex;align-items:center;gap:4px}
+  .pvh-outcome-checkbox{width:30px;height:13px;border:1px solid var(--pvh-border-muted);background:#fff}
+  .pvh-outcome-text{width:54px;font-size:9.8px;font-weight:400;color:#000;padding-left:4px}
+  .pvh-plm-notice-wrap{margin-top:8px;display:flex;justify-content:flex-end}
+  .pvh-plm-notice-box{width:164px;background:var(--pvh-highlight-yellow);border:1px solid var(--pvh-border-muted);color:var(--pvh-alert-red);font-size:8.6px;font-weight:400;line-height:1.25;text-align:center;padding:3px 6px;text-transform:uppercase;outline:none}
+  .pvh-footer-right{display:flex;flex-direction:column;gap:16px;padding-left:24px}
+  .pvh-reviewer-row{display:flex;align-items:flex-end;gap:4px}
+  .pvh-reviewer-line{flex:1;border-bottom:1px solid var(--pvh-border-muted);min-height:13px;outline:none;font-size:9px;font-weight:700}
   @media print{
     .ldf-page{box-shadow:none;margin:0 auto}
     .ldf-page:not(:last-of-type){page-break-after:always}
     .ldf-navbtn{display:none!important}
     .env-chk{display:none!important}
+    .pvh-page{box-shadow:none;margin:0 auto}
+    .pvh-page,.pvh-page *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+    .pvh-swatch-dip-top input{border-bottom:none!important}
   }
   .modal.xl{width:min(860px,96vw)}
   .modal h2{margin:0 0 4px;color:var(--navy);font-size:20px}
@@ -457,6 +532,7 @@
       <button type="button" class="btn" id="btn10cm">10cm</button>
       <button type="button" class="btn" id="btnSweater1">Sweater1</button>
       <button type="button" class="btn" id="btnEnvelope">Envelope</button>
+      <button type="button" class="btn" id="btnPVH">PVH</button>
     </div>
     <div id="fmtContent"></div>
     <div class="actions">
@@ -1234,8 +1310,160 @@
     $('fmtContent').innerHTML=buildEnvelopePage(r);
     $('fmtPrint').style.display='inline-block';
   };
+  /* ---------- PVH: Labdip Submit Form (PVH Color Submit layout, up to 3 options) ---------- */
+  function buildPvhFormPage(records,atmlNo){
+    const list=[records[0]||null,records[1]||records[0]||null,records[2]||records[0]||null];
+    const first=records[0];
+    const today=fmtEnvDate(new Date());
+    const colorName=first?(esc(first.shade)+(first.pantone?(' '+esc(first.pantone)):'')):'';
+    const construction=first?esc(first.count):'';
+    const atmlDisplay=atmlNo?('ATML-'+esc(atmlNo)):'';
+    const ce=(val)=>`contenteditable="true" spellcheck="false">${esc(val)}</div>`;
+    const swatchCell=(label,r,lastEmpty)=>lastEmpty?`<div class="pvh-swatch-cell" aria-label="Empty Option Slot"></div>`:`<div class="pvh-swatch-cell">
+          <div class="pvh-swatch-header">
+            <span class="pvh-swatch-option-title">${label}</span>
+            <span class="pvh-swatch-dip-top">Lab Dip No :<input type="text" value="${r?esc(r.lab):''}"></span>
+            <span></span>
+          </div>
+          <div class="pvh-swatch-box"></div>
+          <div class="pvh-swatch-footer">
+            <div>Lab dip Minimum size 3"X3"</div>
+            <div>Lab Dip No :<input type="text" value="${r?esc(r.lab):''}"></div>
+            <div><input type="text" value="${esc(today)}"></div>
+          </div>
+        </div>`;
+    return `<div class="pvh-page">
+      <div class="pvh-header-top">
+        <div class="pvh-brand-cluster">
+          <img class="pvh-logo-img" src="https://raw.githubusercontent.com/jamansiddiqi/lab/main/PVH%20LOGO.png" onerror="this.onerror=null;this.src='https://placehold.co/220x44/ffffff/000000?text=PVH+%7C+CALVIN+KLEIN+%7C+TOMMY+HILFIGER';">
+        </div>
+        <div class="pvh-header-meta">
+          <span class="pvh-deadline-label">FINAL COLOR APPROVAL DEADLINE BEFORE BULK PHASE: <span contenteditable="true" spellcheck="false"></span></span>
+          <span class="pvh-submit-date-group">
+            <span class="pvh-submit-label">SUBMIT DATE:</span>
+            <span class="pvh-submit-value" contenteditable="true" spellcheck="false">${esc(today)}</span>
+          </span>
+        </div>
+      </div>
+      <div class="pvh-title-banner">LABDIP SUBMIT FORM</div>
+      <section class="pvh-form-fields-section">
+        <div class="pvh-form-col pvh-form-col-left">
+          <div class="pvh-field-row"><div class="pvh-field-label">PVH BRAND :</div><div class="pvh-field-value" ${ce('')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">SEASON :</div><div class="pvh-field-value" ${ce('')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">SEGMENT :</div><div class="pvh-field-value" ${ce('')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">PRODUCT GROUP :</div><div class="pvh-field-value" ${ce('')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">GARMENT STYLE # :</div><div class="pvh-field-value" ${ce('')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">GARMENT STYLE NAME :</div><div class="pvh-field-value" ${ce('')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">COLOR NAME &amp; NUMBER :</div><div class="pvh-field-value" ${ce(first?(first.shade+(first.pantone?(' '+first.pantone):'')):'')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">ROUND # :</div><div class="pvh-field-value center" ${ce('1')}</div>
+          <div class="pvh-light-source-wrapper">
+            <div class="pvh-light-labels-col">
+              <div class="pvh-light-label-spacer"></div>
+              <div class="pvh-light-label-cell">PRIMARY LIGHT SOURCE</div>
+              <div class="pvh-light-label-cell">SECONDARY LIGHT SOURCE</div>
+            </div>
+            <table class="pvh-light-table">
+              <colgroup><col class="pvh-col-region"><col class="pvh-col-illuminant"></colgroup>
+              <tbody>
+                <tr class="pvh-region-row">
+                  <td contenteditable="true" spellcheck="false">CK NA; CK Sports; CKJ Asia<br>TH NA; TH Asia; THJ Asia<br>Dress Furnishings Group</td>
+                  <td contenteditable="true" spellcheck="false">TUG</td>
+                </tr>
+                <tr class="pvh-source-row">
+                  <td contenteditable="true" spellcheck="false">CWF</td>
+                  <td contenteditable="true" spellcheck="false">CWF</td>
+                </tr>
+                <tr class="pvh-source-row">
+                  <td contenteditable="true" spellcheck="false">D65</td>
+                  <td contenteditable="true" spellcheck="false">INCA</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="pvh-form-col pvh-form-col-right">
+          <div class="pvh-field-row"><div class="pvh-field-label">GARMENT VENDOR :</div><div class="pvh-field-value" ${ce('')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">GARMENT FACTORY :</div><div class="pvh-field-value" ${ce('')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">MATERIAL SUPPLIER :</div><div class="pvh-field-value" ${ce('Akij Textile Mills Ltd.')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">PVH MATERIAL NUMBER :</div><div class="pvh-field-value muted" ${ce(atmlDisplay)}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">PVH MATERIAL NAME :</div><div class="pvh-field-value muted" ${ce('Yarn')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">GARMENT PLACEMENT :</div><div class="pvh-field-value" ${ce('')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">CONSTRUCTION &amp; FIBER CONTENT :</div><div class="pvh-field-value" ${ce(construction?first.count:'')}</div>
+          <div class="pvh-field-row"><div class="pvh-field-label">FINISHING :</div><div class="pvh-field-value" ${ce('')}</div>
+          <div class="pvh-fastness-row">
+            <div class="pvh-field-label">COLOR FASTNESS :</div>
+            <div class="pvh-fastness-box" contenteditable="true" spellcheck="false">MILL TO ADVISE ALL DYEING OR COLOR FASTNESS<br>LIMITATIONS AND ISSUES TO APPROPRIATE<br>RAW MATERIALS CONTACTS VIA EMAIL</div>
+          </div>
+          <div class="pvh-fsrr-section">
+            <div class="pvh-fsrr-top-row">
+              <div class="pvh-field-label">FSRR :&nbsp;</div>
+              <div class="pvh-fsrr-controls">
+                <span class="pvh-fsrr-option-text">YES&nbsp;</span>
+                <span class="pvh-checkbox-rect"></span>
+              </div>
+            </div>
+            <div class="pvh-fsrr-top-row">
+              <span class="pvh-fsrr-note">*if yes, a completed FSRR form is required with submission&nbsp;</span>
+              <div class="pvh-fsrr-controls">
+                <span class="pvh-fsrr-option-text">NO&nbsp;</span>
+                <span class="pvh-checkbox-rect"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="pvh-swatch-grid">
+        ${swatchCell('OPTION A:',list[0])}
+        ${swatchCell('OPTION B:',list[1])}
+        ${swatchCell('OPTION C:',list[2])}
+        ${swatchCell('',null,true)}
+      </section>
+      <footer class="pvh-doc-footer">
+        <div class="pvh-confidential-text">PVH Confidential &ndash; For Authorized Use</div>
+        <div class="pvh-footer-grid">
+          <div class="pvh-footer-left">
+            <div class="pvh-natific-row">
+              <span class="pvh-footer-label">NATIFIC WON:</span>
+              <span class="pvh-natific-value" contenteditable="true" spellcheck="false"></span>
+            </div>
+            <div class="pvh-outcome-block">
+              <div class="pvh-outcome-line">
+                <span class="pvh-footer-label">OUTCOME:</span>
+                <span class="pvh-outcome-checkbox"></span>
+                <span class="pvh-outcome-text">REJECTED</span>
+              </div>
+              <div class="pvh-outcome-line">
+                <span class="pvh-outcome-checkbox"></span>
+                <span class="pvh-outcome-text">APPROVED</span>
+              </div>
+            </div>
+            <div class="pvh-plm-notice-wrap">
+              <div class="pvh-plm-notice-box" contenteditable="true" spellcheck="false">FULL COMMENTS WILL BE ENTERED BY<br>PVH IN PLM OR NATIFIC</div>
+            </div>
+          </div>
+          <div class="pvh-footer-right">
+            <div class="pvh-reviewer-row">
+              <span class="pvh-footer-label">REVIEWER NAME:</span>
+              <span class="pvh-reviewer-line" contenteditable="true" spellcheck="false"></span>
+            </div>
+            <div class="pvh-reviewer-row">
+              <span class="pvh-footer-label">REVIEW DATE:</span>
+              <span class="pvh-reviewer-line" contenteditable="true" spellcheck="false"></span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>`;
+  }
+  $('btnPVH').onclick=()=>{
+    setActiveFmtBtn('btnPVH');
+    const r=sel();if(!r)return;
+    $('ldfchkGo').style.display='none';
+    $('fmtContent').innerHTML=buildPvhFormPage([r],r.atml);
+    $('fmtPrint').style.display='inline-block';
+  };
   function setActiveFmtBtn(activeId){
-    ['btnAtmlCode','btn10cm','btnSweater1','btnEnvelope'].forEach(id=>{$(id).classList.toggle('sec',!!(activeId&&id!==activeId));});
+    ['btnAtmlCode','btn10cm','btnSweater1','btnEnvelope','btnPVH'].forEach(id=>{$(id).classList.toggle('sec',!!(activeId&&id!==activeId));});
   }
   $('btn10cm').onclick=()=>{
     setActiveFmtBtn('btn10cm');
