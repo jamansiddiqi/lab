@@ -283,9 +283,15 @@
     .ldf-page:not(:last-of-type){page-break-after:always}
     .ldf-navbtn{display:none!important}
     .env-chk{display:none!important}
+    .tcm-page{box-shadow:none;margin:0 auto}
+    .tcm-page:not(:last-of-type){page-break-after:always}
+    .env-page{box-shadow:none;margin:0 auto}
+    .env-page:not(:last-of-type){page-break-after:always}
     .pvh-page{box-shadow:none;margin:0 auto}
+    .pvh-page:not(:last-of-type){page-break-after:always}
     .pvh-page,.pvh-page *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
     .dk-page{box-shadow:none;margin:0 auto}
+    .dk-page:not(:last-of-type){page-break-after:always}
     .dk-page,.dk-page *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
     .pvh-swatch-dip-top input{border-bottom:none!important}
   }
@@ -1305,6 +1311,9 @@
         </table>
       </div>`;
   }
+  function buildTenCmPages(records){
+    return records.map(r=>buildTenCmPage(r)).join('');
+  }
   /* ---------- Envelope: 3 cut-ready shipping labels per A4 page ---------- */
   function fmtEnvDate(d){
     const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1345,12 +1354,16 @@
         ${copy(false)}
       </div>`;
   }
+  function buildEnvelopePages(records){
+    return records.map(r=>buildEnvelopePage(r)).join('');
+  }
   $('btnEnvelope').onclick=()=>{
     setActiveFmtBtn('btnEnvelope');
-    const r=sel();if(!r)return;
-    $('ldfchkGo').style.display='none';
-    $('fmtContent').innerHTML=buildEnvelopePage(r);
-    $('fmtPrint').style.display='inline-block';
+    if(!(qText.trim()||advActive())){toast('Please filter first all value.');return;}
+    const picked=filtered().map(x=>x.r);
+    if(!picked.length){toast('No matching records found');return;}
+    picked.sort((a,b)=>new Date(a.at||0)-new Date(b.at||0));
+    showLabdipChecklist(picked,'',buildEnvelopePages);
   };
   /* ---------- PVH: Labdip Submit Form (PVH Color Submit layout, up to 3 options) ---------- */
   function buildPvhFormPage(records,atmlNo){
@@ -1497,6 +1510,12 @@
       </footer>
     </div>`;
   }
+  function buildPvhFormPages(records,atmlNo){
+    const groups=[];
+    for(let i=0;i<records.length;i+=3)groups.push(records.slice(i,i+3));
+    if(!groups.length)groups.push([]);
+    return groups.map(g=>buildPvhFormPage(g,atmlNo)).join('');
+  }
   function buildDkFormPage(r){
     const today=fmtEnvDate(new Date());
     const ce=(val)=>`<span contenteditable="true" spellcheck="false">${esc(val||'')}</span>`;
@@ -1574,35 +1593,35 @@
       </div>
     </div>`;
   }
+  function buildDkFormPages(records){
+    return records.map(r=>buildDkFormPage(r)).join('');
+  }
   $('btnPVH').onclick=()=>{
     setActiveFmtBtn('btnPVH');
-    const r=sel();if(!r)return;
-    $('ldfchkGo').style.display='none';
-    $('fmtContent').innerHTML=buildPvhFormPage([r],r.atml);
-    $('fmtPrint').style.display='inline-block';
+    if(!(qText.trim()||advActive())){toast('Please filter first all value.');return;}
+    const picked=filtered().map(x=>x.r);
+    if(!picked.length){toast('No matching records found');return;}
+    picked.sort((a,b)=>new Date(a.at||0)-new Date(b.at||0));
+    showLabdipChecklist(picked,'',buildPvhFormPages);
   };
   $('btnDKC').onclick=()=>{
     setActiveFmtBtn('btnDKC');
-    const r=sel();if(!r)return;
-    $('ldfchkGo').style.display='none';
-    $('fmtContent').innerHTML=buildDkFormPage(r);
-    $('fmtPrint').style.display='inline-block';
+    if(!(qText.trim()||advActive())){toast('Please filter first all value.');return;}
+    const picked=filtered().map(x=>x.r);
+    if(!picked.length){toast('No matching records found');return;}
+    picked.sort((a,b)=>new Date(a.at||0)-new Date(b.at||0));
+    showLabdipChecklist(picked,'',buildDkFormPages);
   };
   function setActiveFmtBtn(activeId){
     ['btnAtmlCode','btn10cm','btnSweater1','btnEnvelope','btnPVH','btnDKC'].forEach(id=>{$(id).classList.toggle('sec',!!(activeId&&id!==activeId));});
   }
   $('btn10cm').onclick=()=>{
     setActiveFmtBtn('btn10cm');
-    const input=prompt('Enter Labdip No (number only):');
-    if(input===null)return;
-    const d=digits(input);
-    if(!d){toast('Please enter a valid Labdip No');return;}
-    const matches=db.records.filter(r=>(r.lab||'')===d);
-    if(!matches.length){toast('No record found for Labdip No '+d);return;}
-    matches.sort((a,b)=>new Date(b.at||0)-new Date(a.at||0));
-    $('ldfchkGo').style.display='none';
-    $('fmtContent').innerHTML=buildTenCmPage(matches[0]);
-    $('fmtPrint').style.display='inline-block';
+    if(!(qText.trim()||advActive())){toast('Please filter first all value.');return;}
+    const picked=filtered().map(x=>x.r);
+    if(!picked.length){toast('No matching records found');return;}
+    picked.sort((a,b)=>new Date(a.at||0)-new Date(b.at||0));
+    showLabdipChecklist(picked,'',buildTenCmPages);
   };
   $('bFormat').onclick=()=>{
     $('fmtContent').innerHTML='';
@@ -1645,14 +1664,11 @@
   }
   $('btnAtmlCode').onclick=()=>{
     setActiveFmtBtn('btnAtmlCode');
-    const input=prompt('Enter ATML No (number only):');
-    if(input===null)return;
-    const d=digits(input);
-    if(!d){toast('Please enter a valid ATML No');return;}
-    const matches=db.records.filter(r=>(r.atml||'')===d);
-    if(!matches.length){toast('No record found for ATML-'+d);return;}
-    matches.sort((a,b)=>new Date(a.at||0)-new Date(b.at||0));
-    showLabdipChecklist(matches,d);
+    if(!(qText.trim()||advActive())){toast('Please filter first all value.');return;}
+    const picked=filtered().map(x=>x.r);
+    if(!picked.length){toast('No matching records found');return;}
+    picked.sort((a,b)=>new Date(a.at||0)-new Date(b.at||0));
+    showLabdipChecklist(picked,'');
   };
   $('btnSweater1').onclick=()=>{
     setActiveFmtBtn('btnSweater1');
