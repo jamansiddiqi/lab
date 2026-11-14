@@ -239,6 +239,45 @@
   .pvh-footer-right{display:flex;flex-direction:column;gap:16px;padding-left:24px}
   .pvh-reviewer-row{display:flex;align-items:flex-end;gap:4px}
   .pvh-reviewer-line{flex:1;border-bottom:1px solid var(--pvh-border-muted);min-height:13px;outline:none;font-size:9px;font-weight:700}
+  .dk-page{width:210mm;min-height:285mm;max-width:100%;margin:0 auto 14px;background:#fff;padding:6mm;box-shadow:0 1px 4px rgba(0,0,0,.15);box-sizing:border-box;font-family:Arial,sans-serif;color:#000;font-size:9px;display:flex;flex-direction:column}
+  .dk-page *{box-sizing:border-box}
+  .dk-topbar{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin-bottom:4px}
+  .dk-logo-img{height:48px;width:auto;object-fit:contain}
+  .dk-title{font-size:19px;font-weight:700;color:#000}
+  .dk-infobox{border:1px solid #000;border-bottom:none}
+  .dk-irow{display:flex;border-bottom:1px solid #000}
+  .dk-icell{padding:2px 5px;display:flex;align-items:center;gap:4px;font-size:9px;font-weight:700}
+  .dk-icell.b{border-left:1px solid #000}
+  .dk-icell input,.dk-icell span[contenteditable]{border:none;outline:none;font-weight:400;font-size:9px;background:transparent;color:#000;flex:1;min-width:20px}
+  .dk-stylebox{border:1px solid #000;padding:2px 5px}
+  .dk-stylebox .lbl{font-weight:700;font-size:9px}
+  .dk-stylebox .val{outline:none;font-weight:400;font-size:9px;min-height:14px;padding-top:1px}
+  .dk-opttable{border:1px solid #000;border-top:none;flex:1;display:flex;flex-direction:column}
+  .dk-optrow{display:flex;flex:1;border-top:1px solid #000}
+  .dk-optcol{border-left:1px solid #000;padding:3px 4px;display:flex;flex-direction:column}
+  .dk-optcol:first-child{border-left:none}
+  .dk-optcol .hd{font-weight:700;font-size:8px;line-height:1.15}
+  .dk-c1{width:15%}
+  .dk-c2{width:13%}
+  .dk-c3{width:15%}
+  .dk-c4{width:24%}
+  .dk-c5{width:33%}
+  .dk-colorname{font-weight:700;font-size:12px;margin-top:4px;outline:none}
+  .dk-pantone{font-weight:700;font-size:11px;outline:none}
+  .dk-optionlbl{font-weight:700;font-size:11px;margin-top:auto;outline:none}
+  .dk-c2 .row1{display:flex;gap:3px;align-items:baseline;margin-top:2px}
+  .dk-c2 .row1 .k{font-weight:700;font-size:8px}
+  .dk-c2 .row1 input{border:none;outline:none;font-weight:700;font-size:9px;background:transparent;color:#000;width:40px}
+  .dk-c2 .cardrow{display:flex;gap:3px;align-items:baseline;margin-top:6px}
+  .dk-c2 .cardrow .k{font-weight:700;font-size:8px;white-space:nowrap}
+  .dk-c2 .cardrow input{border:none;outline:none;font-weight:700;font-size:9px;background:transparent;color:#000;width:70px}
+  .dk-c3 .ls-line{font-size:8px;font-weight:600;margin-top:3px}
+  .dk-c4 .cmtbox{flex:1;outline:none;margin-top:2px}
+  .dk-c5 ul{list-style:none;margin-top:2px;display:flex;flex-direction:column}
+  .dk-c5 li{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #999;padding:1px 2px}
+  .dk-c5 li:last-child{border-bottom:none}
+  .dk-c5 li span{font-size:8px}
+  .dk-c5 li .box{width:16px;height:12px;background:#bfbfbf;flex-shrink:0}
   @media print{
     .ldf-page{box-shadow:none;margin:0 auto}
     .ldf-page:not(:last-of-type){page-break-after:always}
@@ -246,6 +285,8 @@
     .env-chk{display:none!important}
     .pvh-page{box-shadow:none;margin:0 auto}
     .pvh-page,.pvh-page *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+    .dk-page{box-shadow:none;margin:0 auto}
+    .dk-page,.dk-page *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
     .pvh-swatch-dip-top input{border-bottom:none!important}
   }
   .modal.xl{width:min(860px,96vw)}
@@ -533,6 +574,7 @@
       <button type="button" class="btn" id="btnSweater1">Sweater1</button>
       <button type="button" class="btn" id="btnEnvelope">Envelope</button>
       <button type="button" class="btn" id="btnPVH">PVH</button>
+      <button type="button" class="btn" id="btnDKC">DKC</button>
     </div>
     <div id="fmtContent"></div>
     <div class="actions">
@@ -1455,6 +1497,83 @@
       </footer>
     </div>`;
   }
+  function buildDkFormPage(r){
+    const today=fmtEnvDate(new Date());
+    const ce=(val)=>`<span contenteditable="true" spellcheck="false">${esc(val||'')}</span>`;
+    const checklist=['Too red','Too blue','Too green','Too yellow','Too light','Too dark','Not acceptable due to metamerism'];
+    const optCol=(letter)=>`<div class="dk-optcol dk-c1">
+          <div class="hd">Colour standard full name:</div>
+          <div class="dk-colorname" contenteditable="true" spellcheck="false">${esc(r.shade||'')}</div>
+          <div class="dk-pantone" contenteditable="true" spellcheck="false">${esc(r.pantone||'')}</div>
+          <div class="dk-optionlbl" contenteditable="true" spellcheck="false">Option: ${letter}</div>
+        </div>
+        <div class="dk-optcol dk-c2">
+          <div class="hd">Lab Submission:</div>
+          <div class="row1"><span class="k"></span><input type="text" value="1st"></div>
+          <div class="cardrow"><span class="k">Card no #:</span><input type="text" value="${esc(r.atml||'')}"></div>
+        </div>
+        <div class="dk-optcol dk-c3">
+          <div class="hd">Light Source</div>
+          <div class="ls-line" contenteditable="true" spellcheck="false">1st CWF</div>
+          <div class="ls-line" contenteditable="true" spellcheck="false">2nd D65 (Daylight)</div>
+        </div>
+        <div class="dk-optcol dk-c4">
+          <div class="hd">Approved/ Comments:</div>
+          <div class="cmtbox" contenteditable="true" spellcheck="false"></div>
+        </div>
+        <div class="dk-optcol dk-c5">
+          <div class="hd">Rejected/ Comments:</div>
+          <ul>${checklist.map(t=>`<li><span>${esc(t)}</span><span class="box"></span></li>`).join('')}</ul>
+        </div>`;
+    return `<div class="dk-page">
+      <div class="dk-topbar">
+        <img class="dk-logo-img" src="https://github.com/jamansiddiqi/lab/blob/main/dk%20logo.jpg?raw=true" onerror="this.onerror=null;this.src='https://placehold.co/90x48/ffffff/000000?text=dk';">
+        <div class="dk-title">Lab Dip Submission Form</div>
+      </div>
+      <div class="dk-infobox">
+        <div class="dk-irow">
+          <div class="dk-icell" style="flex:2"><b>TO:</b> MS. ${ce('')}</div>
+          <div class="dk-icell b" style="flex:1"><b>DATE:</b>${ce(today)}</div>
+        </div>
+        <div class="dk-irow">
+          <div class="dk-icell" style="flex:1"><b>FROM: MILL/SUPPLIER'S NAME:</b>${ce('Akij Textile Mills Limited')}</div>
+        </div>
+        <div class="dk-irow">
+          <div class="dk-icell" style="flex:1"><b>CONTACT E-MAIL:</b>${ce('')}</div>
+        </div>
+      </div>
+      <div class="dk-stylebox">
+        <div class="lbl">Style # / Style Name:</div>
+        <div class="val" contenteditable="true" spellcheck="false"></div>
+      </div>
+      <div class="dk-infobox">
+        <div class="dk-irow">
+          <div class="dk-icell" style="flex:1"><b>Collection/ Season :</b>${ce('')}</div>
+          <div class="dk-icell b" style="flex:1"><b>Month in store:</b>${ce('')}</div>
+        </div>
+        <div class="dk-irow">
+          <div class="dk-icell" style="flex:1"><b>Corporate or outlet:</b>${ce('')}</div>
+          <div class="dk-icell b" style="flex:1"><b>Which Brand:</b>${ce('')}</div>
+        </div>
+        <div class="dk-irow">
+          <div class="dk-icell" style="flex:1"><b>Fabric quality:</b>${ce(r.count||'')}</div>
+        </div>
+        <div class="dk-irow">
+          <div class="dk-icell" style="flex:1"><b>For main body or trim use:</b>${ce('')}</div>
+          <div class="dk-icell b" style="flex:1"><b>If trim use, DTM or contrast to body:</b>${ce('')}</div>
+        </div>
+        <div class="dk-irow" style="border-bottom:1px solid #000">
+          <div class="dk-icell" style="flex:1"><b>Garment ex factory date:</b>${ce('')}</div>
+          <div class="dk-icell b" style="flex:1"><b>Wash in production:</b>${ce('')}</div>
+        </div>
+      </div>
+      <div class="dk-opttable">
+        <div class="dk-optrow">${optCol('A')}</div>
+        <div class="dk-optrow">${optCol('B')}</div>
+        <div class="dk-optrow">${optCol('C')}</div>
+      </div>
+    </div>`;
+  }
   $('btnPVH').onclick=()=>{
     setActiveFmtBtn('btnPVH');
     const r=sel();if(!r)return;
@@ -1462,8 +1581,15 @@
     $('fmtContent').innerHTML=buildPvhFormPage([r],r.atml);
     $('fmtPrint').style.display='inline-block';
   };
+  $('btnDKC').onclick=()=>{
+    setActiveFmtBtn('btnDKC');
+    const r=sel();if(!r)return;
+    $('ldfchkGo').style.display='none';
+    $('fmtContent').innerHTML=buildDkFormPage(r);
+    $('fmtPrint').style.display='inline-block';
+  };
   function setActiveFmtBtn(activeId){
-    ['btnAtmlCode','btn10cm','btnSweater1','btnEnvelope','btnPVH'].forEach(id=>{$(id).classList.toggle('sec',!!(activeId&&id!==activeId));});
+    ['btnAtmlCode','btn10cm','btnSweater1','btnEnvelope','btnPVH','btnDKC'].forEach(id=>{$(id).classList.toggle('sec',!!(activeId&&id!==activeId));});
   }
   $('btn10cm').onclick=()=>{
     setActiveFmtBtn('btn10cm');
