@@ -489,6 +489,9 @@
       <div class="totalrow"><span>Shade% : <span id="totPct">0.00</span>%</span><span>Cost/Kg ($): <span id="totCost">0.000</span> $</span></div>
     </div>
     <div class="actions">
+      <button type="button" class="btn sec" id="btnImportXL" title="Bulk add records by uploading an Excel file">Import</button>
+      <button type="button" class="btn excel" id="btnExampleXL" title="Download an example Excel file showing the Import format">Ex-XL</button>
+      <input type="file" id="importXLFile" accept=".xlsx,.xls,.csv" style="display:none">
       <button type="button" class="btn danger" id="recCancel" title="Discard changes and close this form">Cancel</button>
       <button type="submit" class="btn" title="Save this recipe record">Save</button>
     </div>
@@ -780,9 +783,17 @@
     for(const x of list){
       const r=x.r,i=x.n-1;
       const tr=document.createElement('tr');if(r.id===selId)tr.className='sel';
+      tr.dataset.id=r.id;
       const _c=costOf(r),_cTxt=`${_c.toFixed(3)} $`,_cCell=_c>=0.3?`<span class="costhot" title="Don't Dye, talk with Higher Management.">${_cTxt}</span>`:_cTxt;
       tr.innerHTML=`<td>${i+1}</td><td>${esc(r.type)}</td><td class="small70">${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td class="small70">${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.pantone)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
-      tr.addEventListener('click',()=>{selId=r.id;render();});
+      /* select by toggling the class only (no full re-render) so a text selection/copy in the row isn't wiped out by a click */
+      tr.addEventListener('click',()=>{
+        if(window.getSelection&&String(window.getSelection())!=='')return; /* user was selecting text, not picking a row */
+        if(selId===r.id)return;
+        selId=r.id;
+        tb.querySelectorAll('tr.sel').forEach(x=>x.classList.remove('sel'));
+        tr.classList.add('sel');
+      });
       tb.appendChild(tr);
     }
     const em=$('emptyMsg');
@@ -843,7 +854,11 @@
     $('fMkt').value=r?r.mkt:'';$('fBuyer').value=r?r.buyer:'';$('fShade').value=r?r.shade:'';$('fPantone').value=r?(r.pantone||''):'';$('fCount').value=r?r.count:'';
     $('fPre').value=r?r.pre:'Bleach';$('fLab').value=r?r.lab:'';$('fRem').value=r?r.rem:'';
     formDyes=r?JSON.parse(JSON.stringify(r.dyes||[])):[];
-    renderDyeRows();$('recOv').classList.add('show');
+    renderDyeRows();
+    const showImport=!r;
+    $('btnImportXL').style.display=showImport?'':'none';
+    $('btnExampleXL').style.display=showImport?'':'none';
+    $('recOv').classList.add('show');
   }
   $('bAdd').onclick=()=>openForm(null);
   $('bEdit').onclick=()=>{const r=sel();if(!r)return;if(r.locked){toast('Record is locked');return;}openForm(r);};
@@ -855,6 +870,143 @@
     else{const id='r'+Date.now();db.records.push({id,...data,locked:false,by:user,at:new Date().toISOString()});selId=id;}
     $('recOv').classList.remove('show');render();
     if(await saveDB())toast('Saved');
+  });
+
+  /* ---------- Bulk Import from Excel (Lab Dip Order Register layout) ---------- */
+  const REG_HEADERS=['SL No','Lab Dip Order No','Date','Buyer Name','Order Type','Marketing Person','No Of Color','Product Name','Color NO','Color Name','Panton No','ATML No','Challan No'];
+  /* normalized header text -> our record field ("lab" = Color NO = the user's Labdip No) */
+  const REG_FIELD_MAP={
+    'sl no':'sl','sl':'sl',
+    'lab dip order no':'orderNo','labdip order no':'orderNo','order no':'orderNo',
+    'date':'date',
+    'buyer name':'buyer','buyer':'buyer',
+    'order type':'type','type':'type',
+    'marketing person':'mkt','marketing':'mkt',
+    'no of color':'noc',
+    'product name':'count','yarn count & composition':'count','count':'count',
+    'color no':'lab','colour no':'lab','color number':'lab','labdip no':'lab','lab dip no':'lab',
+    'color name':'shade','colour name':'shade','shade name':'shade','shade':'shade',
+    'panton no':'pantone','pantone no':'pantone','pantone number':'pantone','pantone':'pantone',
+    'atml no':'atml','atml':'atml',
+    'challan no':'challanNo','challan':'challanNo',
+    'remarks':'rem','pretreatment':'pre','pretreatment type':'pre',
+    'dyes (name:shade%:price ; name:shade%:price)':'dyes','dyes':'dyes'
+  };
+  $('btnExampleXL').onclick=()=>{
+    const data=[
+      [null,'Akij Textile Mills Ltd (Spinning)'],
+      [null,'Golora, Charkhanda, Manikganj'],
+      [null,'LabDip Order Register'],
+      [null,''],
+      REG_HEADERS,
+      ['1','26-006234','2026-11-12','Akij Textile Mills Ltd ( R&D)','','Rafiq Hasan',5,'40/1 CWC','2638358','Grey','16-4402 TCX','',''],
+      ['2','26-006234','2026-11-12','Akij Textile Mills Ltd ( R&D)','','Rafiq Hasan',5,'40/1 CWC','2638359','Ecru','11-4801 TCX','','']
+    ];
+    const ws=XLSX.utils.aoa_to_sheet(data);
+    ws['!merges']=[{s:{r:0,c:1},e:{r:0,c:12}},{s:{r:1,c:1},e:{r:1,c:12}},{s:{r:2,c:1},e:{r:2,c:12}}];
+    ws['!cols']=[{wch:6},{wch:14},{wch:12},{wch:26},{wch:12},{wch:16},{wch:11},{wch:22},{wch:11},{wch:16},{wch:13},{wch:11},{wch:11}];
+    const notes=[
+      ['Import instructions'],
+      ['This is the same layout as your "Lab Dip Order Register" Excel - you can import that file directly.'],
+      ['1. The header row (SL No, Lab Dip Order No, Date, Buyer Name, ... ) can be anywhere near the top - title/letterhead rows above it are fine and are ignored automatically.'],
+      ['2. Color NO = your Labdip No (this is what gets saved as Labdip No here).'],
+      ['3. Date: any common format works (e.g. 2026-11-12 or 12/11/2026). Leave blank for today.'],
+      ['4. Color Name is required - a row with no Color Name is skipped.'],
+      ['5. ATML No / Color NO: numbers only, letters are removed automatically.'],
+      ['6. Lab Dip Order No and Challan No (if present) are kept together in Remarks.'],
+      ['7. Order Type (optional): Sweater, Deskloom, Nylon, Fiber, Space or Others.'],
+      ['8. Delete the 2 example rows before importing your own data, or leave them - they will be imported as records too.']
+    ];
+    const wsN=XLSX.utils.aoa_to_sheet(notes);
+    wsN['!cols']=[{wch:100}];
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Lab Dip Order Register');
+    XLSX.utils.book_append_sheet(wb,wsN,'Instructions');
+    XLSX.writeFile(wb,'YD-LAB-Costing_Example_Import.xlsx');
+  };
+  $('btnImportXL').onclick=()=>{$('importXLFile').value='';$('importXLFile').click();};
+  $('importXLFile').addEventListener('change',async e=>{
+    const file=e.target.files[0];if(!file)return;
+    if(!window.XLSX){toast('Excel library not available');return;}
+    try{
+      const buf=await file.arrayBuffer();
+      const wb=XLSX.read(buf,{type:'array',cellDates:true});
+      const wsName=wb.SheetNames.find(n=>/register|import/i.test(n))||wb.SheetNames[0];
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[wsName],{header:1,raw:false,dateNF:'yyyy-mm-dd'});
+      if(!rows.length){toast('No data found in the Excel file');return;}
+      const norm=v=>String(v??'').trim().toLowerCase();
+      /* find the header row (title/letterhead rows above it are ignored) */
+      let headerIdx=-1,colMap={};
+      for(let i=0;i<Math.min(rows.length,25);i++){
+        const row=rows[i]||[];
+        const map={};let hits=0;
+        row.forEach((cell,ci)=>{
+          const key=REG_FIELD_MAP[norm(cell)];
+          if(key){map[key]=ci;hits++;}
+        });
+        if(map.lab!==undefined&&(map.buyer!==undefined||map.orderNo!==undefined||map.shade!==undefined)){
+          headerIdx=i;colMap=map;break;
+        }
+      }
+      if(headerIdx===-1){toast('Could not find the header row (needs a "Color NO" column) - check the file format');return;}
+      const toDate=v=>{
+        if(!v)return new Date().toISOString().slice(0,10);
+        if(v instanceof Date&&!isNaN(v))return v.toISOString().slice(0,10);
+        const s=String(v).trim();
+        const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+        if(m)return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+        const m2=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+        if(m2)return `${m2[3]}-${m2[2].padStart(2,'0')}-${m2[1].padStart(2,'0')}`;
+        const d=new Date(s);
+        return isNaN(d)?new Date().toISOString().slice(0,10):d.toISOString().slice(0,10);
+      };
+      const parseDyes=v=>{
+        const s=String(v??'').trim();if(!s)return [];
+        return s.split(';').map(part=>part.trim()).filter(Boolean).map(part=>{
+          const bits=part.split(':').map(x=>x.trim());
+          return {name:bits[0]||'',pct:bits[1]||'',price:bits[2]||''};
+        }).filter(d=>d.name);
+      };
+      const get=(row,key)=>colMap[key]!==undefined?row[colMap[key]]:undefined;
+      let added=0,skipped=0;
+      for(let i=headerIdx+1;i<rows.length;i++){
+        const row=rows[i]||[];
+        if(!row.length||row.every(c=>c===undefined||c===null||String(c).trim()==='')){continue;}
+        const shade=capFirst(get(row,'shade'));
+        if(!shade){skipped++;continue;}
+        const orderNo=String(get(row,'orderNo')??'').trim();
+        const challanNo=String(get(row,'challanNo')??'').trim();
+        const remParts=[];
+        if(orderNo)remParts.push('Lab Dip Order No: '+orderNo);
+        if(challanNo)remParts.push('Challan No: '+challanNo);
+        const existingRem=String(get(row,'rem')??'').trim();
+        if(existingRem)remParts.push(existingRem);
+        const data={
+          type:String(get(row,'type')??'').trim(),
+          atml:digits(get(row,'atml')),
+          date:toDate(get(row,'date')),
+          mkt:capFirst(get(row,'mkt')),
+          buyer:capFirst(get(row,'buyer')),
+          shade,
+          pantone:String(get(row,'pantone')??'').trim(),
+          count:String(get(row,'count')??'').trim(),
+          pre:String(get(row,'pre')??'').trim()||'Bleach',
+          lab:digits(get(row,'lab')),
+          rem:remParts.join(' | '),
+          dyes:parseDyes(get(row,'dyes'))
+        };
+        const id='r'+Date.now()+'_'+added;
+        db.records.push({id,...data,locked:false,by:user,at:new Date().toISOString()});
+        added++;
+      }
+      if(!added){toast('No valid rows found - Color Name is required');return;}
+      render();
+      const saved=await saveDB();
+      $('recOv').classList.remove('show');
+      toast(`Imported ${added} record(s)${skipped?`, ${skipped} skipped (no Color Name)`:''}${saved?'':' - not saved to file'}`,4000);
+    }catch(err){
+      toast('Import failed: '+err.message,4000);
+    }
   });
 
   /* ---------- Dye picker ---------- */
