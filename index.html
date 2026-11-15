@@ -46,7 +46,13 @@
   main{flex:1;min-height:0;padding:0 20px 0;display:flex;flex-direction:column}
   .card{background:#fff;border:1px solid var(--line);border-radius:6px;overflow:auto;flex:1;min-height:0}
   table{border-collapse:collapse;width:100%;font-size:12px}
+  #mainTbl{table-layout:fixed}
+  #mainTbl th,#mainTbl td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #mainTbl th{position:relative;box-sizing:border-box}
+  .colResizer{position:absolute;top:0;right:0;width:7px;height:100%;cursor:col-resize;user-select:none;z-index:2}
+  .colResizer:hover,.colResizer.colResizing{background:rgba(0,0,0,.18)}
   td.small70{font-size:8.4px}
+  select.inlineTypeSel{width:100%;font-size:12px;font-family:inherit;padding:1px;border:1px solid var(--line)}
   th{background:var(--navy);color:#fff;text-align:left;padding:5px 7px;position:sticky;top:0;white-space:nowrap;border:1px solid var(--navy)}
   td{padding:3px 7px;border:1px solid var(--line)}
   tr.sel td{background:#dcecfb}
@@ -421,8 +427,8 @@
 <main>
   <div class="fbar" id="fbar"><span id="fInfo"></span><button type="button" class="btn sm sec" id="fClear" title="Clear search &amp; filters, show latest records">Clear filter</div>
   <div class="card">
-    <table>
-      <thead><tr><th>#</th><th>Type</th><th>ATML No</th><th>Date</th><th>Marketing Person</th><th>Buyer</th><th>Shade Name</th><th>Pantone Number</th><th>Count</th><th>Pretreatment</th><th>Labdip No</th><th>Shade%</th><th>Cost/Kg ($)</th><th>Remarks</th><th>Lock</th><th>Entry By</th></tr></thead>
+    <table id="mainTbl">
+      <thead><tr><th style="width:36px">#</th><th style="width:70px">Type</th><th style="width:112px">Esim. Order no.</th><th style="width:80px">ATML No</th><th style="width:85px">Date</th><th style="width:110px">Marketing Person</th><th style="width:110px">Buyer</th><th style="width:130px">Shade Name</th><th style="width:100px">Pantone Number</th><th style="width:150px">Count</th><th style="width:85px">Pretreatment</th><th style="width:75px">Labdip No</th><th style="width:65px">Shade%</th><th style="width:85px">Cost/Kg ($)</th><th style="width:150px">Remarks</th><th style="width:45px">Lock</th><th style="width:140px">Entry By</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
@@ -468,6 +474,7 @@
         <select id="fType" required><option value="">Select Type</option><option>Sweater</option><option>Deskloom</option><option>Nylon</option><option>Fiber</option><option>Space</option><option>Others</option></select></div>
       <div><label>ATML No</label>
         <div class="atmlwrap"><span class="atmlpre">ATML-</span><input id="fAtml" inputmode="numeric" pattern="[0-9]*" autocomplete="off"></div></div>
+      <div><label>Esim. Order no.</label><input id="fEsim" autocomplete="off" placeholder="26-006235"></div>
       <div><label>Date</label><input type="date" id="fDate" required></div>
       <div><label>Marketing Person</label><input id="fMkt" list="dlMkt" autocomplete="off"></div>
       <div><label>Buyer</label><input id="fBuyer" list="dlBuyer" autocomplete="off"></div>
@@ -554,6 +561,7 @@
       <div><label>Marketing Person</label><input id="aMkt" list="dlMkt" autocomplete="off"></div>
       <div><label>Type</label><select id="aType"><option value="">Any</option><option>Sweater</option><option>Deskloom</option><option>Nylon</option><option>Fiber</option><option>Space</option><option>Others</option></select></div>
       <div><label>ATML No</label><input id="aAtml" inputmode="numeric"></div>
+      <div><label>Esimsol Order no.</label><input id="aEsim" autocomplete="off"></div>
     </div>
     <div class="actions">
       <button type="button" class="btn sec" id="advClose" title="Close without changing the filter">Close</button>
@@ -732,7 +740,7 @@
     const q=low(qText).trim(),out=[];
     for(let i=db.records.length-1;i>=0;i--){          // newest first
       const r=db.records[i];
-      if(q&&!(low(r.mkt).includes(q)||low(r.buyer).includes(q)||low(r.shade).includes(q)||low(r.lab).includes(q)))continue;
+      if(q&&!(low(r.mkt).includes(q)||low(r.buyer).includes(q)||low(r.shade).includes(q)||low(r.lab).includes(q)||low(r.esim).includes(q)))continue;
       if(has(adv.from)&&(r.date||'')<adv.from)continue;
       if(has(adv.to)&&(r.date||'')>adv.to)continue;
       if(has(adv.by)&&!low(r.by).includes(low(adv.by).trim()))continue;
@@ -744,6 +752,7 @@
       if(has(adv.lab)&&!low(r.lab).includes(low(adv.lab).trim()))continue;
       if(has(adv.type)&&r.type!==adv.type)continue;
       if(has(adv.atml)&&!low(r.atml).includes(low(adv.atml).trim()))continue;
+      if(has(adv.esim)&&!low(r.esim).includes(low(adv.esim).trim()))continue;
       const pc=+pctOf(r).toFixed(2);
       if(has(adv.pmin)&&pc<num(adv.pmin))continue;
       if(has(adv.pmax)&&pc>num(adv.pmax))continue;
@@ -774,8 +783,29 @@
     if(has(adv.cmax))p.push('Cost/Kg max: '+adv.cmax+' $');
     if(has(adv.type))p.push('Type: '+adv.type);
     if(has(adv.atml))p.push('ATML No: '+adv.atml);
+    if(has(adv.esim))p.push('Esimsol Order No: '+adv.esim);
     return p.join('  |  ')||'All records';
   }
+  const TYPE_OPTIONS=['','Sweater','Deskloom','Nylon','Fiber','Space','Others'];
+  function makeResizable(table){
+    if(!table)return;
+    table.querySelectorAll('thead th').forEach(th=>{
+      if(th.querySelector('.colResizer'))return;
+      const r=document.createElement('span');
+      r.className='colResizer';
+      th.appendChild(r);
+      r.addEventListener('mousedown',e=>{
+        e.preventDefault();e.stopPropagation();
+        const startX=e.pageX,startW=th.offsetWidth;
+        r.classList.add('colResizing');
+        const onMove=ev=>{th.style.width=Math.max(28,startW+(ev.pageX-startX))+'px';};
+        const onUp=()=>{document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);r.classList.remove('colResizing');};
+        document.addEventListener('mousemove',onMove);
+        document.addEventListener('mouseup',onUp);
+      });
+    });
+  }
+  makeResizable($('mainTbl'));
   function render(){
     const tb=$('tbody');tb.innerHTML='';
     const on=!!qText.trim()||advActive();
@@ -785,7 +815,7 @@
       const tr=document.createElement('tr');if(r.id===selId)tr.className='sel';
       tr.dataset.id=r.id;
       const _c=costOf(r),_cTxt=`${_c.toFixed(3)} $`,_cCell=_c>=0.3?`<span class="costhot" title="Don't Dye, talk with Higher Management.">${_cTxt}</span>`:_cTxt;
-      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.type)}</td><td class="small70">${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td class="small70">${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.pantone)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
+      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.type)}</td><td class="small70">${esc(r.esim)}</td><td class="small70">${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td class="small70">${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.pantone)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
       /* select by toggling the class only (no full re-render) so a text selection/copy in the row isn't wiped out by a click */
       tr.addEventListener('click',()=>{
         if(window.getSelection&&String(window.getSelection())!=='')return; /* user was selecting text, not picking a row */
@@ -793,6 +823,66 @@
         selId=r.id;
         tb.querySelectorAll('tr.sel').forEach(x=>x.classList.remove('sel'));
         tr.classList.add('sel');
+      });
+      const tdType=tr.children[1];
+      tdType.title='Double-click to change Type';
+      tdType.addEventListener('dblclick',ev=>{
+        ev.stopPropagation();
+        if(r.locked){toast('Record is locked');return;}
+        if(tdType.querySelector('select'))return;
+        const prevText=tdType.textContent;
+        tdType.innerHTML='';
+        const sel=document.createElement('select');
+        sel.className='inlineTypeSel';
+        TYPE_OPTIONS.forEach(opt=>{
+          const o=document.createElement('option');
+          o.value=opt;o.textContent=opt||'Select Type';
+          if((r.type||'')===opt)o.selected=true;
+          sel.appendChild(o);
+        });
+        tdType.appendChild(sel);
+        sel.focus();
+        try{if(sel.showPicker)sel.showPicker();}catch(e){}
+        let done=false;
+        const finish=async(commit)=>{
+          if(done)return;done=true;
+          if(commit&&sel.value!==(r.type||'')){
+            r.type=sel.value;
+            tdType.textContent=r.type;
+            const saved=await saveDB();
+            toast(saved?'Type updated':'Type updated - not saved to file');
+          }else{
+            tdType.textContent=prevText;
+          }
+        };
+        sel.addEventListener('change',()=>finish(true));
+        sel.addEventListener('blur',()=>finish(false));
+        sel.addEventListener('keydown',e=>{if(e.key==='Escape')finish(false);});
+      });
+      tr.addEventListener('dblclick',()=>{
+        if(r.locked){toast('Record is locked');return;}
+        selId=r.id;
+        tb.querySelectorAll('tr.sel').forEach(x=>x.classList.remove('sel'));
+        tr.classList.add('sel');
+        openForm(r);
+      });
+      const tdEntryBy=tr.children[16];
+      tdEntryBy.title='Double-click to delete this row';
+      tdEntryBy.addEventListener('dblclick',async ev=>{
+        ev.stopPropagation();
+        if(r.locked){toast('Record is locked');return;}
+        const pass=prompt('Enter Delete Password for this row:');
+        if(pass===null)return;
+        if(pass.trim().toLowerCase()!==(r.by||'').trim().toLowerCase()){
+          toast('Incorrect password - row not deleted');return;
+        }
+        const idx=db.records.findIndex(x=>x.id===r.id);
+        if(idx===-1)return;
+        db.records.splice(idx,1);
+        if(selId===r.id)selId=null;
+        render();
+        const saved=await saveDB();
+        toast(saved?'Row deleted':'Row deleted - not saved to file');
       });
       tb.appendChild(tr);
     }
@@ -849,7 +939,7 @@
   function openForm(r){
     editId=r?r.id:null;
     $('recTitle').textContent=r?'Edit Recipe':'Add Your Recipe';
-    $('fType').value=r?(r.type||''):'';$('fAtml').value=r?(r.atml||''):'';
+    $('fType').value=r?(r.type||''):'';$('fAtml').value=r?(r.atml||''):'';$('fEsim').value=r?(r.esim||''):'';
     $('fDate').value=r?r.date:new Date().toISOString().slice(0,10);
     $('fMkt').value=r?r.mkt:'';$('fBuyer').value=r?r.buyer:'';$('fShade').value=r?r.shade:'';$('fPantone').value=r?(r.pantone||''):'';$('fCount').value=r?r.count:'';
     $('fPre').value=r?r.pre:'Bleach';$('fLab').value=r?r.lab:'';$('fRem').value=r?r.rem:'';
@@ -865,7 +955,7 @@
   $('recCancel').onclick=()=>$('recOv').classList.remove('show');
   $('recForm').addEventListener('submit',async e=>{
     e.preventDefault();
-    const data={type:$('fType').value,atml:digits($('fAtml').value),date:$('fDate').value,mkt:capFirst($('fMkt').value),buyer:capFirst($('fBuyer').value),shade:capFirst($('fShade').value),pantone:$('fPantone').value.trim(),count:$('fCount').value.trim(),pre:$('fPre').value,lab:digits($('fLab').value),rem:$('fRem').value.trim(),dyes:formDyes.map(d=>({name:d.name,pct:d.pct,price:d.price}))};
+    const data={type:$('fType').value,atml:digits($('fAtml').value),esim:$('fEsim').value.trim(),date:$('fDate').value,mkt:capFirst($('fMkt').value),buyer:capFirst($('fBuyer').value),shade:capFirst($('fShade').value),pantone:$('fPantone').value.trim(),count:$('fCount').value.trim(),pre:$('fPre').value,lab:digits($('fLab').value),rem:$('fRem').value.trim(),dyes:formDyes.map(d=>({name:d.name,pct:d.pct,price:d.price}))};
     if(editId){Object.assign(db.records.find(x=>x.id===editId),data,{modBy:user,modAt:new Date().toISOString()});}
     else{const id='r'+Date.now();db.records.push({id,...data,locked:false,by:user,at:new Date().toISOString()});selId=id;}
     $('recOv').classList.remove('show');render();
@@ -913,7 +1003,7 @@
       ['3. Date: any common format works (e.g. 2026-11-12 or 12/11/2026). Leave blank for today.'],
       ['4. Color Name is required - a row with no Color Name is skipped.'],
       ['5. ATML No / Color NO: numbers only, letters are removed automatically.'],
-      ['6. Lab Dip Order No and Challan No (if present) are kept together in Remarks.'],
+      ['6. Lab Dip Order No goes into the "Esim. Order no." column. Challan No (if present) is kept in Remarks.'],
       ['7. Order Type (optional): Sweater, Deskloom, Nylon, Fiber, Space or Others.'],
       ['8. Delete the 2 example rows before importing your own data, or leave them - they will be imported as records too.']
     ];
@@ -977,13 +1067,13 @@
         const orderNo=String(get(row,'orderNo')??'').trim();
         const challanNo=String(get(row,'challanNo')??'').trim();
         const remParts=[];
-        if(orderNo)remParts.push('Lab Dip Order No: '+orderNo);
         if(challanNo)remParts.push('Challan No: '+challanNo);
         const existingRem=String(get(row,'rem')??'').trim();
         if(existingRem)remParts.push(existingRem);
         const data={
           type:String(get(row,'type')??'').trim(),
           atml:digits(get(row,'atml')),
+          esim:orderNo,
           date:toDate(get(row,'date')),
           mkt:capFirst(get(row,'mkt')),
           buyer:capFirst(get(row,'buyer')),
@@ -1149,7 +1239,7 @@
   $('fAtml').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('aLab').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('qSearch').addEventListener('input',e=>{qText=e.target.value;render();});
-  const AF={aFrom:'from',aTo:'to',aBy:'by',aMkt:'mkt',aBuyer:'buyer',aShade:'shade',aPantone:'pantone',aCount:'count',aLab:'lab',aPmin:'pmin',aPmax:'pmax',aCmin:'cmin',aCmax:'cmax',aType:'type',aAtml:'atml'};
+  const AF={aFrom:'from',aTo:'to',aBy:'by',aMkt:'mkt',aBuyer:'buyer',aShade:'shade',aPantone:'pantone',aCount:'count',aLab:'lab',aPmin:'pmin',aPmax:'pmax',aCmin:'cmin',aCmax:'cmax',aType:'type',aAtml:'atml',aEsim:'esim'};
   $('bAdv').onclick=()=>{for(const k in AF)$(k).value=adv[AF[k]]||'';$('advOv').classList.add('show');};
   $('advClose').onclick=()=>$('advOv').classList.remove('show');
   $('advClear').onclick=()=>{adv={};for(const k in AF)$(k).value='';render();};
@@ -1912,7 +2002,10 @@
 })();
 (()=>{
   const messages=[
-    "Esimsol এ যা এন্ট্রি হবে, তার Excel Download করে Add এর ভিতরে Import বাটনের মাধ্যমে এখানে নিয়ে আসতে পারবেন। একই কাজ দুই যায়গায় আর করতে হবে না।"
+     "Esimsol এ যা এন্ট্রি হবে, তার Excel Download করে Add এর ভিতরে Import বাটনের মাধ্যমে এখানে নিয়ে আসতে পারবেন। একই কাজ দুই যায়গায় আর করতে হবে না।"
+    "Esimsol এ যা এন্ট্রি হবে, তার Excel Download করে Add এর ভিতরে Import বাটনের মাধ্যমে এখানে নিয়ে আসতে পারবেন। একই কাজ দুই যায়গায় আর করতে হবে না।",
+  "Type cell এ ডাবল ক্লিক করে Type Change করা যাবে",
+    "Row তে ডাবল ক্লিক করে Edit করা যাবে।"
   ];
   let idx=0;
   const msgEl=document.getElementById('footer-message');
