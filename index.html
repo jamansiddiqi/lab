@@ -48,7 +48,7 @@
   table{border-collapse:collapse;width:100%;font-size:12px}
   #mainTbl{table-layout:fixed}
   #mainTbl th,#mainTbl td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #mainTbl th{position:relative;box-sizing:border-box}
+  #mainTbl th{position:sticky;top:0;box-sizing:border-box;z-index:2}
   .colResizer{position:absolute;top:0;right:0;width:7px;height:100%;cursor:col-resize;user-select:none;z-index:2}
   .colResizer:hover,.colResizer.colResizing{background:rgba(0,0,0,.18)}
   td.small70{font-size:8.4px}
@@ -56,6 +56,7 @@
   th{background:var(--navy);color:#fff;text-align:left;padding:5px 7px;position:sticky;top:0;white-space:nowrap;border:1px solid var(--navy)}
   td{padding:3px 7px;border:1px solid var(--line)}
   tr.sel td{background:#dcecfb}
+  #mainTbl td.labdup{background:#ff9b9b!important;color:#5a0000;font-weight:700;cursor:help}
   #tbody tr{cursor:pointer}
   #tbody tr:hover td{background:#f0f6fd}
   .lockic{color:var(--danger);font-weight:700}
@@ -438,7 +439,7 @@
   <div class="fbar" id="fbar"><span id="fInfo"></span><button type="button" class="btn sm sec" id="fClear" title="Clear search &amp; filters, show latest records">Clear filter</div>
   <div class="card">
     <table id="mainTbl">
-      <thead><tr><th style="width:36px">#</th><th style="width:70px">Type</th><th style="width:112px">Esim. Order no.</th><th style="width:80px">ATML No</th><th style="width:85px">Date</th><th style="width:110px">Marketing Person</th><th style="width:110px">Buyer</th><th style="width:130px">Shade Name</th><th style="width:100px">Pantone Number</th><th style="width:150px">Count</th><th style="width:85px">Pretreatment</th><th style="width:75px">Labdip No</th><th style="width:60px">Part?</th><th style="width:65px">Shade%</th><th style="width:85px">Cost/Kg ($)</th><th style="width:150px">Remarks</th><th style="width:45px">Lock</th><th style="width:140px">Entry By</th></tr></thead>
+      <thead><tr><th style="width:36px">#</th><th style="width:36px">SL</th><th style="width:70px">Type</th><th style="width:112px">Esim. Order no.</th><th style="width:80px">ATML No</th><th style="width:85px">Date</th><th style="width:110px">Marketing Person</th><th style="width:110px">Buyer</th><th style="width:130px">Shade Name</th><th style="width:100px">Pantone Number</th><th style="width:150px">Count</th><th style="width:85px">Pretreatment</th><th style="width:75px">Labdip No</th><th style="width:60px">Part?</th><th style="width:65px">Shade%</th><th style="width:85px">Cost/Kg ($)</th><th style="width:150px">Remarks</th><th style="width:45px">Lock</th><th style="width:140px">Entry By</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
@@ -596,6 +597,17 @@
   </form>
 </div>
 
+<div class="overlay" id="impDupOv">
+  <div class="modal">
+    <h2>Duplicate Labdip No Found</h2>
+    <p id="impDupMsg" style="font-size:12px;line-height:1.5;margin-bottom:10px"></p>
+    <div class="actions">
+      <button type="button" class="btn sec" id="impDupCancel" title="Cancel the import, nothing will be added">Cancel</button>
+      <button type="button" class="btn" id="impDupSkip" title="Import only the fresh (non-duplicate) Labdip rows">Skip Duplicate</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="fmtOv">
   <div class="modal fmtmodal">
     <h2 class="ldf-title">Print Your Lab Dip Submission.</h2>
@@ -749,6 +761,14 @@
   const costOf=r=>(r.dyes||[]).reduce((s,d)=>s+num(d.price)*num(d.pct)/100,0);
   const pctOf=r=>(r.dyes||[]).reduce((s,d)=>s+num(d.pct),0);
   const partOf=r=>{const n=(r.dyes||[]).length;return n===0?'':n<=4?'Single':'Both';};
+  function buildLabMap(){
+    const map={};
+    db.records.forEach(r=>{
+      const lab=(r.lab||'').trim();if(!lab)return;
+      const k=low(lab);(map[k]=map[k]||[]).push(r);
+    });
+    return map;
+  }
   const has=v=>v!==undefined&&v!==null&&String(v).trim()!=='';
   const advActive=()=>Object.values(adv).some(has);
   function filtered(){
@@ -827,12 +847,19 @@
     const tb=$('tbody');tb.innerHTML='';
     const on=!!qText.trim()||advActive();
     const list=visible();
+    const labMap=buildLabMap();
+    let sl=0;
     for(const x of list){
       const r=x.r,i=x.n-1;
+      sl++;
       const tr=document.createElement('tr');if(r.id===selId)tr.className='sel';
       tr.dataset.id=r.id;
       const _c=costOf(r),_cTxt=`${_c.toFixed(3)} $`,_cThresh=partOf(r)==='Both'?0.5:0.3,_cCell=_c>=_cThresh?`<span class="costhot" title="Don't Dye, talk with Higher Management.">${_cTxt}</span>`:_cTxt;
-      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.type)}</td><td class="small70">${esc(r.esim)}</td><td class="small70">${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td class="small70">${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.pantone)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${esc(partOf(r))}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
+      const _labTrim=(r.lab||'').trim();
+      const _labGroup=_labTrim?(labMap[low(_labTrim)]||[]):[];
+      const _labDup=_labGroup.length>1;
+      const _labCell=_labDup?`<td class="labdup" title="This LD duplicated on ${esc(_labGroup.filter(x2=>x2.id!==r.id).map(x2=>dt(x2.date)||'(no date)').join(', '))}">${esc(r.lab)}</td>`:`<td>${esc(r.lab)}</td>`;
+      tr.innerHTML=`<td>${i+1}</td><td>${sl}</td><td>${esc(r.type)}</td><td class="small70">${esc(r.esim)}</td><td class="small70">${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td class="small70">${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.pantone)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td>${_labCell}<td>${esc(partOf(r))}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
       /* select by toggling the class only (no full re-render) so a text selection/copy in the row isn't wiped out by a click */
       tr.addEventListener('click',()=>{
         if(window.getSelection&&String(window.getSelection())!=='')return; /* user was selecting text, not picking a row */
@@ -841,7 +868,7 @@
         tb.querySelectorAll('tr.sel').forEach(x=>x.classList.remove('sel'));
         tr.classList.add('sel');
       });
-      const tdType=tr.children[1];
+      const tdType=tr.children[2];
       tdType.title='Double-click to change Type';
       tdType.addEventListener('dblclick',ev=>{
         ev.stopPropagation();
@@ -883,7 +910,7 @@
         tr.classList.add('sel');
         openForm(r);
       });
-      const tdEntryBy=tr.children[17];
+      const tdEntryBy=tr.children[18];
       tdEntryBy.title='Double-click to delete this row';
       tdEntryBy.addEventListener('dblclick',async ev=>{
         ev.stopPropagation();
@@ -1100,7 +1127,7 @@
         }).filter(d=>d.name);
       };
       const get=(row,key)=>colMap[key]!==undefined?row[colMap[key]]:undefined;
-      let added=0,skipped=0;
+      const candidates=[];let skipped=0;
       for(let i=headerIdx+1;i<rows.length;i++){
         const row=rows[i]||[];
         if(!row.length||row.every(c=>c===undefined||c===null||String(c).trim()==='')){continue;}
@@ -1127,19 +1154,55 @@
           rem:remParts.join(' | '),
           dyes:parseDyes(get(row,'dyes'))
         };
-        const id='r'+Date.now()+'_'+added;
-        db.records.push({id,...data,locked:false,by:user,at:new Date().toISOString()});
-        added++;
+        candidates.push(data);
       }
-      if(!added){toast('No valid rows found - Color Name is required');return;}
-      render();
-      const saved=await saveDB();
-      $('recOv').classList.remove('show');
-      toast(`Imported ${added} record(s)${skipped?`, ${skipped} skipped (no Color Name)`:''}${saved?'':' - not saved to file'}`,4000);
+      if(!candidates.length){toast('No valid rows found - Color Name is required');return;}
+      const existingLabs=new Set(db.records.map(r=>(r.lab||'').trim().toLowerCase()).filter(Boolean));
+      const dupLabs=[...new Set(candidates.map(d=>(d.lab||'').trim()).filter(v=>v&&existingLabs.has(v.toLowerCase())))];
+      if(dupLabs.length){
+        pendingImport={candidates,skipped,dupLabs};
+        $('impDupMsg').textContent=`This LD (Labdip No) already exists in the database: ${dupLabs.join(', ')}. Do you want to skip these?`;
+        $('impDupOv').classList.add('show');
+        return;
+      }
+      await commitImportCandidates(candidates,skipped);
     }catch(err){
       toast('Import failed: '+err.message,4000);
     }
   });
+  let pendingImport=null;
+  async function commitImportCandidates(list,skipped,skippedDup){
+    skippedDup=skippedDup||0;
+    let added=0;
+    list.forEach(data=>{
+      const id='r'+Date.now()+'_'+added+'_'+Math.random().toString(36).slice(2,7);
+      db.records.push({id,...data,locked:false,by:user,at:new Date().toISOString()});
+      added++;
+    });
+    render();
+    const saved=await saveDB();
+    $('recOv').classList.remove('show');
+    const notes=[];
+    if(skipped)notes.push(skipped+' skipped (no Color Name)');
+    if(skippedDup)notes.push(skippedDup+' skipped (duplicate LD)');
+    toast(`Imported ${added} record(s)${notes.length?', '+notes.join(', '):''}${saved?'':' - not saved to file'}`,4500);
+  }
+  $('impDupCancel').onclick=()=>{
+    pendingImport=null;
+    $('impDupOv').classList.remove('show');
+    toast('Import cancelled - nothing added',3000);
+  };
+  $('impDupSkip').onclick=async()=>{
+    if(!pendingImport)return;
+    const {candidates,skipped,dupLabs}=pendingImport;
+    const dupSet=new Set(dupLabs.map(v=>v.toLowerCase()));
+    const fresh=candidates.filter(d=>!((d.lab||'').trim()&&dupSet.has((d.lab||'').trim().toLowerCase())));
+    const skippedDup=candidates.length-fresh.length;
+    pendingImport=null;
+    $('impDupOv').classList.remove('show');
+    if(!fresh.length){toast('All rows were duplicate - nothing added',4000);return;}
+    await commitImportCandidates(fresh,skipped,skippedDup);
+  };
 
   /* ---------- Dye picker ---------- */
   function renderPick(){
