@@ -91,6 +91,16 @@
   #advForm input,#advForm select{padding:4px 7px;font-size:12px}
   #advForm .grid2{gap:0 8px}
   #advForm .actions{margin-top:8px}
+  .mktFieldWrap{display:flex;flex-direction:column}
+  .mktCheckList{display:none;max-height:112px;overflow-y:auto;border:1px solid #ccc;border-radius:4px;margin-top:4px;background:#fff}
+  .mktCheckList label{display:flex;align-items:center;gap:6px;padding:4px 7px;font-size:11px;font-weight:400;margin:0;cursor:pointer}
+  .mktCheckList label input[type=checkbox]{flex:0 0 14px;width:14px!important;height:14px;margin:0;padding:0}
+  .mktCheckList label span{flex:1 1 auto;text-align:left}
+  .mktCheckList label:hover{background:#eef3ff}
+  .mktCheckList .none{padding:5px 7px;color:#999;font-size:11px}
+  .mktChips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;min-height:0}
+  .mktChips span{background:#e8f0fe;border:1px solid #b9cdfb;border-radius:10px;padding:1px 6px 1px 9px;font-size:10px;display:inline-flex;align-items:center;gap:4px}
+  .mktChips span b{cursor:pointer;color:#555;font-weight:700;font-size:12px}
   .toolbar button#bFormat{background:#7c3aed;color:#fff;border-color:#7c3aed}
   .toolbar button#bFormat:hover{background:#6525d6;border-color:#6525d6}
   .fmtmodal{width:min(900px,96vw);max-height:92vh;display:flex;flex-direction:column}
@@ -428,7 +438,7 @@
   <div class="fbar" id="fbar"><span id="fInfo"></span><button type="button" class="btn sm sec" id="fClear" title="Clear search &amp; filters, show latest records">Clear filter</div>
   <div class="card">
     <table id="mainTbl">
-      <thead><tr><th style="width:36px">#</th><th style="width:70px">Type</th><th style="width:112px">Esim. Order no.</th><th style="width:80px">ATML No</th><th style="width:85px">Date</th><th style="width:110px">Marketing Person</th><th style="width:110px">Buyer</th><th style="width:130px">Shade Name</th><th style="width:100px">Pantone Number</th><th style="width:150px">Count</th><th style="width:85px">Pretreatment</th><th style="width:75px">Labdip No</th><th style="width:65px">Shade%</th><th style="width:85px">Cost/Kg ($)</th><th style="width:150px">Remarks</th><th style="width:45px">Lock</th><th style="width:140px">Entry By</th></tr></thead>
+      <thead><tr><th style="width:36px">#</th><th style="width:70px">Type</th><th style="width:112px">Esim. Order no.</th><th style="width:80px">ATML No</th><th style="width:85px">Date</th><th style="width:110px">Marketing Person</th><th style="width:110px">Buyer</th><th style="width:130px">Shade Name</th><th style="width:100px">Pantone Number</th><th style="width:150px">Count</th><th style="width:85px">Pretreatment</th><th style="width:75px">Labdip No</th><th style="width:60px">Part?</th><th style="width:65px">Shade%</th><th style="width:85px">Cost/Kg ($)</th><th style="width:150px">Remarks</th><th style="width:45px">Lock</th><th style="width:140px">Entry By</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
@@ -553,15 +563,19 @@
       <div><label>Pantone Number</label><input id="aPantone"></div>
       <div><label>Labdip No</label><input id="aLab" inputmode="numeric"></div>
       <div><label>Yarn Count &amp; Composition</label><input id="aCount" list="dlCount" autocomplete="off"></div>
-      <div></div>
       <div><label>Shade% Min</label><input id="aPmin" type="number" step="any" min="0"></div>
       <div><label>Shade% Max</label><input id="aPmax" type="number" step="any" min="0"></div>
       <div><label>Cost/Kg ($) Min</label><input id="aCmin" type="number" step="any" min="0"></div>
       <div><label>Cost/Kg ($) Max</label><input id="aCmax" type="number" step="any" min="0"></div>
-      <div><label>Marketing Person</label><input id="aMkt" list="dlMkt" autocomplete="off"></div>
+      <div class="mktFieldWrap"><label>Marketing Person</label>
+        <input type="text" id="aMktSearch" placeholder="Nam likhe search korun..." autocomplete="off">
+        <div id="aMktChips" class="mktChips"></div>
+        <div id="aMktList" class="mktCheckList"></div>
+      </div>
       <div><label>Type</label><select id="aType"><option value="">Any</option><option>Sweater</option><option>Deskloom</option><option>Nylon</option><option>Fiber</option><option>Space</option><option>Others</option></select></div>
       <div><label>ATML No</label><input id="aAtml" inputmode="numeric"></div>
       <div><label>Esimsol Order no.</label><input id="aEsim" autocomplete="off"></div>
+      <div><label>Part?</label><select id="aPart"><option value="">Any</option><option value="blank">(blank)</option><option value="Single">Single</option><option value="Both">Both</option></select></div>
     </div>
     <div class="actions">
       <button type="button" class="btn sec" id="advClose" title="Close without changing the filter">Close</button>
@@ -615,7 +629,7 @@
   const FILE_NAME='lab recipe data.json';
   const FTYPES=[{description:'JSON database',accept:{'application/json':['.json']}}];
   let db={meta:{app:'YD-LAB-Costing',created:new Date().toISOString()},dyes:[],records:[]};
-  let fileHandle=null,user=null,selId=null,editId=null,formDyes=[],qText='',adv={};
+  let fileHandle=null,user=null,selId=null,editId=null,formDyes=[],qText='',adv={},allMkts=[],aMktSel=[];
   const $=id=>document.getElementById(id);
 
   function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('ydlabcosting',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
@@ -734,6 +748,7 @@
   /* ---------- table ---------- */
   const costOf=r=>(r.dyes||[]).reduce((s,d)=>s+num(d.price)*num(d.pct)/100,0);
   const pctOf=r=>(r.dyes||[]).reduce((s,d)=>s+num(d.pct),0);
+  const partOf=r=>{const n=(r.dyes||[]).length;return n===0?'':n<=4?'Single':'Both';};
   const has=v=>v!==undefined&&v!==null&&String(v).trim()!=='';
   const advActive=()=>Object.values(adv).some(has);
   function filtered(){
@@ -744,7 +759,7 @@
       if(has(adv.from)&&(r.date||'')<adv.from)continue;
       if(has(adv.to)&&(r.date||'')>adv.to)continue;
       if(has(adv.by)&&!low(r.by).includes(low(adv.by).trim()))continue;
-      if(has(adv.mkt)&&!low(r.mkt).includes(low(adv.mkt).trim()))continue;
+      if(Array.isArray(adv.mkt)&&adv.mkt.length&&!adv.mkt.some(m=>low(r.mkt)===low(m).trim()))continue;
       if(has(adv.buyer)&&!low(r.buyer).includes(low(adv.buyer).trim()))continue;
       if(has(adv.shade)&&!low(r.shade).includes(low(adv.shade).trim()))continue;
       if(has(adv.pantone)&&!low(r.pantone).includes(low(adv.pantone).trim()))continue;
@@ -753,6 +768,7 @@
       if(has(adv.type)&&r.type!==adv.type)continue;
       if(has(adv.atml)&&!low(r.atml).includes(low(adv.atml).trim()))continue;
       if(has(adv.esim)&&!low(r.esim).includes(low(adv.esim).trim()))continue;
+      if(has(adv.part)){const pv=partOf(r);const want=adv.part==='blank'?'':adv.part;if(pv!==want)continue;}
       const pc=+pctOf(r).toFixed(2);
       if(has(adv.pmin)&&pc<num(adv.pmin))continue;
       if(has(adv.pmax)&&pc>num(adv.pmax))continue;
@@ -771,7 +787,7 @@
     if(has(adv.from))p.push('From: '+dt(adv.from));
     if(has(adv.to))p.push('To: '+dt(adv.to));
     if(has(adv.by))p.push('Entry By: '+adv.by);
-    if(has(adv.mkt))p.push('Marketing Person: '+adv.mkt);
+    if(has(adv.mkt))p.push('Marketing Person: '+(Array.isArray(adv.mkt)?adv.mkt.join(', '):adv.mkt));
     if(has(adv.buyer))p.push('Buyer: '+adv.buyer);
     if(has(adv.shade))p.push('Shade: '+adv.shade);
     if(has(adv.pantone))p.push('Pantone: '+adv.pantone);
@@ -784,6 +800,7 @@
     if(has(adv.type))p.push('Type: '+adv.type);
     if(has(adv.atml))p.push('ATML No: '+adv.atml);
     if(has(adv.esim))p.push('Esimsol Order No: '+adv.esim);
+    if(has(adv.part))p.push('Part?: '+(adv.part==='blank'?'(blank)':adv.part));
     return p.join('  |  ')||'All records';
   }
   const TYPE_OPTIONS=['','Sweater','Deskloom','Nylon','Fiber','Space','Others'];
@@ -814,8 +831,8 @@
       const r=x.r,i=x.n-1;
       const tr=document.createElement('tr');if(r.id===selId)tr.className='sel';
       tr.dataset.id=r.id;
-      const _c=costOf(r),_cTxt=`${_c.toFixed(3)} $`,_cCell=_c>=0.3?`<span class="costhot" title="Don't Dye, talk with Higher Management.">${_cTxt}</span>`:_cTxt;
-      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.type)}</td><td class="small70">${esc(r.esim)}</td><td class="small70">${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td class="small70">${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.pantone)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
+      const _c=costOf(r),_cTxt=`${_c.toFixed(3)} $`,_cThresh=partOf(r)==='Both'?0.5:0.3,_cCell=_c>=_cThresh?`<span class="costhot" title="Don't Dye, talk with Higher Management.">${_cTxt}</span>`:_cTxt;
+      tr.innerHTML=`<td>${i+1}</td><td>${esc(r.type)}</td><td class="small70">${esc(r.esim)}</td><td class="small70">${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td class="small70">${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.pantone)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td><td>${esc(r.lab)}</td><td>${esc(partOf(r))}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
       /* select by toggling the class only (no full re-render) so a text selection/copy in the row isn't wiped out by a click */
       tr.addEventListener('click',()=>{
         if(window.getSelection&&String(window.getSelection())!=='')return; /* user was selecting text, not picking a row */
@@ -866,7 +883,7 @@
         tr.classList.add('sel');
         openForm(r);
       });
-      const tdEntryBy=tr.children[16];
+      const tdEntryBy=tr.children[17];
       tdEntryBy.title='Double-click to delete this row';
       tdEntryBy.addEventListener('dblclick',async ev=>{
         ev.stopPropagation();
@@ -909,8 +926,33 @@
     const bys=[...new Set(db.records.map(r=>(r.by||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
     $('dlBuyer').innerHTML=buyers.map(v=>`<option value="${esc(v)}">`).join('');
     $('dlMkt').innerHTML=mkts.map(v=>`<option value="${esc(v)}">`).join('');
+    allMkts=mkts;
+    if($('aMktList'))renderMktList($('aMktSearch')?$('aMktSearch').value:'');
     $('dlCount').innerHTML=counts.map(v=>`<option value="${esc(v)}">`).join('');
     $('dlBy').innerHTML=bys.map(v=>`<option value="${esc(v)}">`).join('');
+  }
+  function renderMktChips(){
+    const box=$('aMktChips');if(!box)return;
+    box.innerHTML=aMktSel.length?aMktSel.map(v=>`<span>${esc(v)}<b data-v="${esc(v)}" title="Remove">&times;</b></span>`).join(''):'';
+    box.querySelectorAll('b').forEach(b=>{
+      b.onclick=()=>{aMktSel=aMktSel.filter(x=>x!==b.dataset.v);renderMktChips();renderMktList($('aMktSearch').value);};
+    });
+  }
+  function renderMktList(q){
+    const list=$('aMktList');if(!list)return;
+    const ql=low(q||'').trim();
+    if(!ql){list.innerHTML='';list.style.display='none';return;}
+    list.style.display='block';
+    const matches=allMkts.filter(v=>low(v).includes(ql));
+    if(!matches.length){list.innerHTML='<div class="none">No match</div>';return;}
+    list.innerHTML=matches.map(v=>`<label><input type="checkbox" value="${esc(v)}" ${aMktSel.includes(v)?'checked':''}><span>${esc(v)}</span></label>`).join('');
+    list.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+      cb.onchange=()=>{
+        if(cb.checked){if(!aMktSel.includes(cb.value))aMktSel.push(cb.value);}
+        else{aMktSel=aMktSel.filter(x=>x!==cb.value);}
+        renderMktChips();
+      };
+    });
   }
   function sel(){const r=db.records.find(x=>x.id===selId);if(!r)toast('Please select a row first');return r;}
 
@@ -1239,13 +1281,25 @@
   $('fAtml').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('aLab').addEventListener('input',e=>{e.target.value=digits(e.target.value);});
   $('qSearch').addEventListener('input',e=>{qText=e.target.value;render();});
-  const AF={aFrom:'from',aTo:'to',aBy:'by',aMkt:'mkt',aBuyer:'buyer',aShade:'shade',aPantone:'pantone',aCount:'count',aLab:'lab',aPmin:'pmin',aPmax:'pmax',aCmin:'cmin',aCmax:'cmax',aType:'type',aAtml:'atml',aEsim:'esim'};
-  $('bAdv').onclick=()=>{for(const k in AF)$(k).value=adv[AF[k]]||'';$('advOv').classList.add('show');};
+  const AF={aFrom:'from',aTo:'to',aBy:'by',aMkt:'mkt',aBuyer:'buyer',aShade:'shade',aPantone:'pantone',aCount:'count',aLab:'lab',aPmin:'pmin',aPmax:'pmax',aCmin:'cmin',aCmax:'cmax',aType:'type',aAtml:'atml',aEsim:'esim',aPart:'part'};
+  $('aMktSearch').addEventListener('input',e=>renderMktList(e.target.value));
+  $('bAdv').onclick=()=>{
+    for(const k in AF){if(k==='aMkt')continue;$(k).value=adv[AF[k]]||'';}
+    aMktSel=Array.isArray(adv.mkt)?[...adv.mkt]:[];
+    $('aMktSearch').value='';
+    renderMktList('');renderMktChips();
+    $('advOv').classList.add('show');
+  };
   $('advClose').onclick=()=>$('advOv').classList.remove('show');
-  $('advClear').onclick=()=>{adv={};for(const k in AF)$(k).value='';render();};
+  $('advClear').onclick=()=>{
+    adv={};for(const k in AF){if(k==='aMkt')continue;$(k).value='';}
+    aMktSel=[];$('aMktSearch').value='';renderMktList('');renderMktChips();
+    render();
+  };
   $('advForm').addEventListener('submit',e=>{
     e.preventDefault();
-    adv={};for(const k in AF){const v=$(k).value.trim();if(v)adv[AF[k]]=v;}
+    adv={};for(const k in AF){if(k==='aMkt')continue;const v=$(k).value.trim();if(v)adv[AF[k]]=v;}
+    if(aMktSel.length)adv.mkt=[...aMktSel];
     $('advOv').classList.remove('show');render();
     toast(filtered().length+' record(s) found');
   });
@@ -2002,9 +2056,12 @@
 })();
 (()=>{
   const messages=[
-     "Esimsol এ যা এন্ট্রি হবে, তার Excel Download করে Add এর ভিতরে Import বাটনের মাধ্যমে এখানে নিয়ে আসতে পারবেন। একই কাজ দুই যায়গায় আর করতে হবে না।",
-    "Type cell এ ডাবল ক্লিক করে Type Change করা যাবে",
-    "Row তে ডাবল ক্লিক করে Edit করা যাবে।"
+    "Dyed Chemical এর দাম নিয়মিত আপডেট করূন।",
+    "সেভ করা ফাইলটি নিয়মিত ব্যকআপ রাখুন।",
+    "Cost কমানোর চেষ্টা করূন।",
+    "অতিরিক্ত Cost কতৃপক্ষকে অবগত করূন।",
+    "Akij Textile Mills Limited",
+    "We Believe in Continuous Development."
   ];
   let idx=0;
   const msgEl=document.getElementById('footer-message');
