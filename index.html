@@ -34,6 +34,8 @@
   .toolbar button#bTableExcel:hover{background:#176e46;border-color:#176e46}
   .toolbar button#bMultiMail{background:#d62f2f;color:#fff;border-color:#d62f2f}
   .toolbar button#bMultiMail:hover{background:#b21f1f;border-color:#b21f1f}
+  .toolbar button#bDelSel{background:#d62f2f;color:#fff;border-color:#d62f2f}
+  .toolbar button#bDelSel:hover{background:#b21f1f;border-color:#b21f1f}
   .toolbar button#bWhatsapp{background:#25d366;color:#fff;border-color:#25d366}
   .toolbar button#bWhatsapp:hover{background:#1ebe57;border-color:#1ebe57}
   .fbar{display:none;align-items:center;gap:10px;margin:8px 0;font-size:12px;color:#5b6b7e}
@@ -57,6 +59,9 @@
   td{padding:3px 7px;border:1px solid var(--line)}
   tr.sel td{background:#dcecfb}
   #mainTbl td.labdup{background:#ff9b9b!important;color:#5a0000;font-weight:700;cursor:help}
+  #mainTbl .multiSelCell{display:none;text-align:center;padding:4px 2px}
+  #mainTbl.multiDelMode .multiSelCell{display:table-cell}
+  #mainTbl .rowSelChk{width:14px;height:14px;margin:0}
   #tbody tr{cursor:pointer}
   #tbody tr:hover td{background:#f0f6fd}
   .lockic{color:var(--danger);font-weight:700}
@@ -431,6 +436,9 @@
   <button id="bMultiMail" title="Email all currently filtered records' cost details + a PDF report">Multiple Mail</button>
   <button id="bWhatsapp" title="Send the selected record's cost details via WhatsApp (cost must be above 0.2$)">WhatsApp</button>
   <button id="bFormat" title="Print a Lab Dip Submission Form by ATML No">Format</button>
+  <button id="bSelAll" style="display:none" title="Select all rows currently shown in the table">Select All</button>
+  <button id="bDelSel" style="display:none" title="Delete all ticked rows">Delete</button>
+  <button id="bMultiDelCancel" style="display:none" title="Exit multi-row delete mode">Cancel</button>
   <input type="file" id="dyeFile" accept=".xlsx,.xls,.csv" hidden>
   <div class="status"><span><span class="dot" id="dbDot"></span><span id="dbTxt">Database not connected</span></span><button id="bConn" title="Connect or reconnect to the JSON database file">Connect</div>
 </div>
@@ -439,7 +447,7 @@
   <div class="fbar" id="fbar"><span id="fInfo"></span><button type="button" class="btn sm sec" id="fClear" title="Clear search &amp; filters, show latest records">Clear filter</div>
   <div class="card">
     <table id="mainTbl">
-      <thead><tr><th style="width:36px">#</th><th style="width:36px">SL</th><th style="width:70px">Type</th><th style="width:112px">Esim. Order no.</th><th style="width:80px">ATML No</th><th style="width:85px">Date</th><th style="width:110px">Marketing Person</th><th style="width:110px">Buyer</th><th style="width:130px">Shade Name</th><th style="width:100px">Pantone Number</th><th style="width:150px">Count</th><th style="width:85px">Pretreatment</th><th style="width:75px">Labdip No</th><th style="width:60px">Part?</th><th style="width:65px">Shade%</th><th style="width:85px">Cost/Kg ($)</th><th style="width:150px">Remarks</th><th style="width:45px">Lock</th><th style="width:140px">Entry By</th></tr></thead>
+      <thead><tr><th class="multiSelCell" style="width:28px"></th><th id="thHash" style="width:36px" title="Double-click: multi-row delete">#</th><th style="width:36px">SL</th><th style="width:70px">Type</th><th style="width:112px">Esim. Order no.</th><th style="width:80px">ATML No</th><th style="width:85px">Date</th><th style="width:110px">Marketing Person</th><th style="width:110px">Buyer</th><th style="width:130px">Shade Name</th><th style="width:100px">Pantone Number</th><th style="width:150px">Count</th><th style="width:85px">Pretreatment</th><th style="width:75px">Labdip No</th><th style="width:60px">Part?</th><th style="width:65px">Shade%</th><th style="width:85px">Cost/Kg ($)</th><th style="width:150px">Remarks</th><th style="width:45px">Lock</th><th style="width:140px">Entry By</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
@@ -608,6 +616,17 @@
   </div>
 </div>
 
+<div class="overlay" id="multiDelPassOv">
+  <form class="modal" id="multiDelPassForm" autocomplete="off">
+    <h2>Multi-Row Delete</h2>
+    <div><label>Input your password (emergency help number)</label><input type="password" id="multiDelPassInput" autocomplete="off"></div>
+    <div class="actions">
+      <button type="button" class="btn sec" id="multiDelPassCancel" title="Cancel">Cancel</button>
+      <button type="submit" class="btn" title="Submit password">OK</button>
+    </div>
+  </form>
+</div>
+
 <div class="overlay" id="fmtOv">
   <div class="modal fmtmodal">
     <h2 class="ldf-title">Print Your Lab Dip Submission.</h2>
@@ -641,7 +660,7 @@
   const FILE_NAME='lab recipe data.json';
   const FTYPES=[{description:'JSON database',accept:{'application/json':['.json']}}];
   let db={meta:{app:'YD-LAB-Costing',created:new Date().toISOString()},dyes:[],records:[]};
-  let fileHandle=null,user=null,selId=null,editId=null,formDyes=[],qText='',adv={},allMkts=[],aMktSel=[];
+  let fileHandle=null,user=null,selId=null,editId=null,formDyes=[],qText='',adv={},allMkts=[],aMktSel=[],multiDelMode=false,multiDelSel=new Set();
   const $=id=>document.getElementById(id);
 
   function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('ydlabcosting',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
@@ -859,7 +878,13 @@
       const _labGroup=_labTrim?(labMap[low(_labTrim)]||[]):[];
       const _labDup=_labGroup.length>1;
       const _labCell=_labDup?`<td class="labdup" title="This LD duplicated on ${esc(_labGroup.filter(x2=>x2.id!==r.id).map(x2=>dt(x2.date)||'(no date)').join(', '))}">${esc(r.lab)}</td>`:`<td>${esc(r.lab)}</td>`;
-      tr.innerHTML=`<td>${i+1}</td><td>${sl}</td><td>${esc(r.type)}</td><td class="small70">${esc(r.esim)}</td><td class="small70">${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td class="small70">${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.pantone)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td>${_labCell}<td>${esc(partOf(r))}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
+      tr.innerHTML=`<td class="multiSelCell"><input type="checkbox" class="rowSelChk" data-id="${r.id}" ${multiDelSel.has(r.id)?'checked':''}></td><td>${i+1}</td><td>${sl}</td><td>${esc(r.type)}</td><td class="small70">${esc(r.esim)}</td><td class="small70">${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td class="small70">${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.pantone)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td>${_labCell}<td>${esc(partOf(r))}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
+      const _rowChk=tr.querySelector('.rowSelChk');
+      _rowChk.addEventListener('click',ev=>ev.stopPropagation());
+      _rowChk.addEventListener('dblclick',ev=>ev.stopPropagation());
+      _rowChk.addEventListener('change',()=>{
+        if(_rowChk.checked)multiDelSel.add(r.id);else multiDelSel.delete(r.id);
+      });
       /* select by toggling the class only (no full re-render) so a text selection/copy in the row isn't wiped out by a click */
       tr.addEventListener('click',()=>{
         if(window.getSelection&&String(window.getSelection())!=='')return; /* user was selecting text, not picking a row */
@@ -868,7 +893,7 @@
         tb.querySelectorAll('tr.sel').forEach(x=>x.classList.remove('sel'));
         tr.classList.add('sel');
       });
-      const tdType=tr.children[2];
+      const tdType=tr.children[3];
       tdType.title='Double-click to change Type';
       tdType.addEventListener('dblclick',ev=>{
         ev.stopPropagation();
@@ -910,7 +935,7 @@
         tr.classList.add('sel');
         openForm(r);
       });
-      const tdEntryBy=tr.children[18];
+      const tdEntryBy=tr.children[19];
       tdEntryBy.title='Double-click to delete this row';
       tdEntryBy.addEventListener('dblclick',async ev=>{
         ev.stopPropagation();
@@ -1139,8 +1164,17 @@
         if(challanNo)remParts.push('Challan No: '+challanNo);
         const existingRem=String(get(row,'rem')??'').trim();
         if(existingRem)remParts.push(existingRem);
+        const rowType=String(get(row,'type')??'').trim();
+        let matchedType='';
+        if(rowType){
+          matchedType=TYPE_OPTIONS.find(t=>t&&t.toLowerCase()===rowType.toLowerCase())||'';
+          if(!matchedType){
+            toast('Order type not match, Please correction first in your excel.',5000);
+            return;
+          }
+        }
         const data={
-          type:String(get(row,'type')??'').trim(),
+          type:matchedType,
           atml:digits(get(row,'atml')),
           esim:orderNo,
           date:toDate(get(row,'date')),
@@ -1367,6 +1401,45 @@
     toast(filtered().length+' record(s) found');
   });
   $('fClear').onclick=()=>{adv={};qText='';$('qSearch').value='';render();};
+
+  /* ---------- Multi-row delete (left tick-box column) ---------- */
+  function setMultiDelMode(on){
+    multiDelMode=on;
+    $('mainTbl').classList.toggle('multiDelMode',on);
+    $('bSelAll').style.display=on?'':'none';
+    $('bDelSel').style.display=on?'':'none';
+    $('bMultiDelCancel').style.display=on?'':'none';
+    if(!on)multiDelSel.clear();
+    render();
+  }
+  $('thHash').addEventListener('dblclick',()=>{
+    $('multiDelPassInput').value='';
+    $('multiDelPassOv').classList.add('show');
+    setTimeout(()=>$('multiDelPassInput').focus(),50);
+  });
+  $('multiDelPassCancel').onclick=()=>$('multiDelPassOv').classList.remove('show');
+  $('multiDelPassForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    const pass=$('multiDelPassInput').value;
+    $('multiDelPassOv').classList.remove('show');
+    if(pass!=='Jaman@999'){toast('Incorrect password');return;}
+    setMultiDelMode(true);
+    toast('Multi-row delete mode ON - tick rows, then use Select All / Delete');
+  });
+  $('bSelAll').onclick=()=>{
+    document.querySelectorAll('#tbody .rowSelChk').forEach(cb=>{cb.checked=true;multiDelSel.add(cb.dataset.id);});
+  };
+  $('bMultiDelCancel').onclick=()=>setMultiDelMode(false);
+  $('bDelSel').onclick=async()=>{
+    if(!multiDelSel.size){toast('No row ticked');return;}
+    const ids=[...multiDelSel];
+    const lockedCount=db.records.filter(r=>ids.includes(r.id)&&r.locked).length;
+    db.records=db.records.filter(r=>!(ids.includes(r.id)&&!r.locked));
+    if(selId&&ids.includes(selId))selId=null;
+    setMultiDelMode(false);
+    const saved=await saveDB();
+    toast(`${ids.length-lockedCount} row(s) deleted${lockedCount?`, ${lockedCount} locked row(s) skipped`:''}${saved?'':' - not saved to file'}`,4000);
+  };
 
   /* ---------- Report Print (table report of the records currently shown) ---------- */
   function buildReportHtml(list){
