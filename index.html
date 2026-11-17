@@ -59,6 +59,9 @@
   td{padding:3px 7px;border:1px solid var(--line)}
   tr.sel td{background:#dcecfb}
   #mainTbl td.labdup{background:#ff9b9b!important;color:#5a0000;font-weight:700;cursor:help}
+  #mainTbl thead th{cursor:grab}
+  #mainTbl thead th.colDragging{opacity:.4}
+  #mainTbl thead th.colDragOver{background:#ffe9a8!important}
   #mainTbl .multiSelCell{display:none;text-align:center;padding:4px 2px}
   #mainTbl.multiDelMode .multiSelCell{display:table-cell}
   #mainTbl .rowSelChk{width:14px;height:14px;margin:0}
@@ -447,7 +450,7 @@
   <div class="fbar" id="fbar"><span id="fInfo"></span><button type="button" class="btn sm sec" id="fClear" title="Clear search &amp; filters, show latest records">Clear filter</div>
   <div class="card">
     <table id="mainTbl">
-      <thead><tr><th class="multiSelCell" style="width:28px"></th><th id="thHash" style="width:36px" title="Double-click: multi-row delete">#</th><th style="width:36px">SL</th><th style="width:70px">Type</th><th style="width:112px">Esim. Order no.</th><th style="width:80px">ATML No</th><th style="width:85px">Date</th><th style="width:110px">Marketing Person</th><th style="width:110px">Buyer</th><th style="width:130px">Shade Name</th><th style="width:100px">Pantone Number</th><th style="width:150px">Count</th><th style="width:85px">Pretreatment</th><th style="width:75px">Labdip No</th><th style="width:60px">Part?</th><th style="width:65px">Shade%</th><th style="width:85px">Cost/Kg ($)</th><th style="width:150px">Remarks</th><th style="width:45px">Lock</th><th style="width:140px">Entry By</th></tr></thead>
+      <thead><tr><th class="multiSelCell" data-col="multisel" style="width:28px"></th><th id="thHash" data-col="hash" style="width:36px" title="Double-click: multi-row delete">#</th><th data-col="sl" style="width:36px">SL</th><th data-col="type" style="width:70px">Type</th><th data-col="esim" style="width:112px">Esim. Order no.</th><th data-col="atml" style="width:80px">ATML No</th><th data-col="date" style="width:85px">Date</th><th data-col="mkt" style="width:110px">Marketing Person</th><th data-col="buyer" style="width:110px">Buyer</th><th data-col="shade" style="width:130px">Shade Name</th><th data-col="pantone" style="width:100px">Pantone Number</th><th data-col="count" style="width:150px">Count</th><th data-col="pre" style="width:85px">Pretreatment</th><th data-col="lab" style="width:75px">Labdip No</th><th data-col="part" style="width:60px">Part?</th><th data-col="pct" style="width:65px">Shade%</th><th data-col="cost" style="width:85px">Cost/Kg ($)</th><th data-col="rem" style="width:150px">Remarks</th><th data-col="lock" style="width:45px">Lock</th><th data-col="entryby" style="width:140px">Entry By</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
     <div class="empty" id="emptyMsg">No records yet. Click <b>Add</b> to create one.</div>
@@ -819,7 +822,7 @@
     return out;
   }
   /* normally the latest 50 rows; with search / advance search all matching rows */
-  function visible(){const f=filtered();return (qText.trim()||advActive())?f:f.slice(0,50);}
+  function visible(){const f=filtered();return (qText.trim()||advActive())?f:f.slice(0,100);}
   function filterText(){
     const p=[];
     if(qText.trim())p.push('Search: '+qText.trim());
@@ -849,6 +852,7 @@
       if(th.querySelector('.colResizer'))return;
       const r=document.createElement('span');
       r.className='colResizer';
+      r.draggable=false;
       th.appendChild(r);
       r.addEventListener('mousedown',e=>{
         e.preventDefault();e.stopPropagation();
@@ -862,6 +866,51 @@
     });
   }
   makeResizable($('mainTbl'));
+  let colOrder=null,dragSrcCol=null;
+  function reorderRowCells(tr,order){
+    order.forEach(key=>{
+      const td=tr.querySelector(`[data-col="${key}"]`);
+      if(td)tr.appendChild(td);
+    });
+  }
+  function currentColOrder(){
+    return Array.from($('mainTbl').querySelectorAll('thead th[data-col]')).map(th=>th.dataset.col);
+  }
+  function setupColumnDrag(){
+    const ths=$('mainTbl').querySelectorAll('thead th[data-col]');
+    ths.forEach(th=>{
+      if(th.dataset.dragReady)return;
+      th.dataset.dragReady='1';
+      th.draggable=true;
+      th.addEventListener('dragstart',e=>{
+        dragSrcCol=th.dataset.col;
+        th.classList.add('colDragging');
+        try{e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',dragSrcCol);}catch(err){}
+      });
+      th.addEventListener('dragover',e=>{e.preventDefault();th.classList.add('colDragOver');});
+      th.addEventListener('dragleave',()=>th.classList.remove('colDragOver'));
+      th.addEventListener('dragend',()=>{
+        $('mainTbl').querySelectorAll('thead th[data-col]').forEach(x=>{x.classList.remove('colDragging');x.classList.remove('colDragOver');});
+      });
+      th.addEventListener('drop',e=>{
+        e.preventDefault();
+        th.classList.remove('colDragOver');
+        const targetCol=th.dataset.col;
+        if(!dragSrcCol||dragSrcCol===targetCol){dragSrcCol=null;return;}
+        const headRow=th.parentElement;
+        const srcTh=headRow.querySelector(`th[data-col="${dragSrcCol}"]`);
+        if(!srcTh){dragSrcCol=null;return;}
+        const thsArr=Array.from(headRow.children);
+        const srcIdx=thsArr.indexOf(srcTh),tgtIdx=thsArr.indexOf(th);
+        if(srcIdx<tgtIdx)headRow.insertBefore(srcTh,th.nextSibling);
+        else headRow.insertBefore(srcTh,th);
+        colOrder=currentColOrder();
+        dragSrcCol=null;
+        render();
+      });
+    });
+  }
+  setupColumnDrag();
   function render(){
     const tb=$('tbody');tb.innerHTML='';
     const on=!!qText.trim()||advActive();
@@ -877,8 +926,9 @@
       const _labTrim=(r.lab||'').trim();
       const _labGroup=_labTrim?(labMap[low(_labTrim)]||[]):[];
       const _labDup=_labGroup.length>1;
-      const _labCell=_labDup?`<td class="labdup" title="This LD duplicated on ${esc(_labGroup.filter(x2=>x2.id!==r.id).map(x2=>dt(x2.date)||'(no date)').join(', '))}">${esc(r.lab)}</td>`:`<td>${esc(r.lab)}</td>`;
-      tr.innerHTML=`<td class="multiSelCell"><input type="checkbox" class="rowSelChk" data-id="${r.id}" ${multiDelSel.has(r.id)?'checked':''}></td><td>${i+1}</td><td>${sl}</td><td>${esc(r.type)}</td><td class="small70">${esc(r.esim)}</td><td class="small70">${r.atml?'ATML-'+esc(r.atml):''}</td><td>${esc(r.date)}</td><td class="small70">${esc(r.mkt)}</td><td>${esc(r.buyer)}</td><td>${esc(r.shade)}</td><td>${esc(r.pantone)}</td><td>${esc(r.count)}</td><td>${esc(r.pre)}</td>${_labCell}<td>${esc(partOf(r))}</td><td>${pctOf(r).toFixed(2)}%</td><td>${_cCell}</td><td>${esc(r.rem)}</td><td>${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td>${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
+      const _labCell=_labDup?`<td data-col="lab" class="labdup" title="This LD duplicated on ${esc(_labGroup.filter(x2=>x2.id!==r.id).map(x2=>dt(x2.date)||'(no date)').join(', '))}">${esc(r.lab)}</td>`:`<td data-col="lab">${esc(r.lab)}</td>`;
+      tr.innerHTML=`<td data-col="multisel" class="multiSelCell"><input type="checkbox" class="rowSelChk" data-id="${r.id}" ${multiDelSel.has(r.id)?'checked':''}></td><td data-col="hash">${i+1}</td><td data-col="sl">${sl}</td><td data-col="type">${esc(r.type)}</td><td data-col="esim" class="small70">${esc(r.esim)}</td><td data-col="atml" class="small70">${r.atml?'ATML-'+esc(r.atml):''}</td><td data-col="date">${esc(r.date)}</td><td data-col="mkt" class="small70">${esc(r.mkt)}</td><td data-col="buyer">${esc(r.buyer)}</td><td data-col="shade">${esc(r.shade)}</td><td data-col="pantone">${esc(r.pantone)}</td><td data-col="count">${esc(r.count)}</td><td data-col="pre">${esc(r.pre)}</td>${_labCell}<td data-col="part">${esc(partOf(r))}</td><td data-col="pct">${pctOf(r).toFixed(2)}%</td><td data-col="cost">${_cCell}</td><td data-col="rem">${esc(r.rem)}</td><td data-col="lock">${r.locked?'<span class="lockic">&#128274;</span>':''}</td><td data-col="entryby">${esc(r.by)}${r.at?' | '+fmtTime(r.at):''}</td>`;
+      if(colOrder)reorderRowCells(tr,colOrder);
       const _rowChk=tr.querySelector('.rowSelChk');
       _rowChk.addEventListener('click',ev=>ev.stopPropagation());
       _rowChk.addEventListener('dblclick',ev=>ev.stopPropagation());
@@ -893,7 +943,7 @@
         tb.querySelectorAll('tr.sel').forEach(x=>x.classList.remove('sel'));
         tr.classList.add('sel');
       });
-      const tdType=tr.children[3];
+      const tdType=tr.querySelector('[data-col="type"]');
       tdType.title='Double-click to change Type';
       tdType.addEventListener('dblclick',ev=>{
         ev.stopPropagation();
@@ -935,7 +985,7 @@
         tr.classList.add('sel');
         openForm(r);
       });
-      const tdEntryBy=tr.children[19];
+      const tdEntryBy=tr.querySelector('[data-col="entryby"]');
       tdEntryBy.title='Double-click to delete this row';
       tdEntryBy.addEventListener('dblclick',async ev=>{
         ev.stopPropagation();
